@@ -29,7 +29,7 @@ CXXFLAGS += -std=c++0x -g -Wall -Wextra -pthread
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = graph_test
+TESTS = graph_test.exe
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -78,5 +78,5 @@ graph_test.o : $(GRAPH_UTILS_DIR)/graph_test.cc \
                      $(GRAPH_UTILS_DIR)/graph.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph_test.cc
 
-graph_test : graph.o graph_test.o gtest_main.a
+graph_test.exe : graph.o graph_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
