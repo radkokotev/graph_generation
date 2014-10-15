@@ -15,21 +15,23 @@
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
 GTEST_DIR = gtest-1.7.0
+NAUTY_DIR = nauty
 
 # Where to find user code.
 GRAPH_UTILS_DIR = graph_utils
+NAUTY_UTILS_DIR = nauty_utils
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
-CPPFLAGS += -isystem $(GTEST_DIR)/include
+CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem ./
 
 # Flags passed to the C++ compiler.
 CXXFLAGS += -std=c++0x -g -Wall -Wextra -pthread
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = graph_test.exe
+TESTS = graph_test.exe nauty_wrapper_test.exe
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -71,12 +73,43 @@ gtest_main.a : gtest-all.o gtest_main.o
 # gtest_main.a, depending on whether it defines its own main()
 # function.
 
+# graph_utils
 graph.o : $(GRAPH_UTILS_DIR)/graph.cc $(GRAPH_UTILS_DIR)/graph.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph.cc
 
 graph_test.o : $(GRAPH_UTILS_DIR)/graph_test.cc \
-                     $(GRAPH_UTILS_DIR)/graph.h $(GTEST_HEADERS)
+               $(GRAPH_UTILS_DIR)/graph.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph_test.cc
 
 graph_test.exe : graph.o graph_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+# core nauty
+$(NAUTY_DIR)/nauty.o : $(NAUTY_DIR)/nauty.c $(NAUTY_DIR)/nauty.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(NAUTY_DIR)/nauty.c
+
+$(NAUTY_DIR)/nautil.o : $(NAUTY_DIR)/nautil.c
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(NAUTY_DIR)/nautil.c
+
+$(NAUTY_DIR)/naugraph.o : $(NAUTY_DIR)/naugraph.c
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(NAUTY_DIR)/naugraph.c
+
+$(NAUTY_DIR)/schreier.o : $(NAUTY_DIR)/schreier.c
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(NAUTY_DIR)/schreier.c
+
+$(NAUTY_DIR)/naurng.o : $(NAUTY_DIR)/naurng.c
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(NAUTY_DIR)/naurng.c
+
+# nauty_utils
+nauty_wrapper.o : $(NAUTY_UTILS_DIR)/nauty_wrapper.cc $(NAUTY_UTILS_DIR)/nauty_wrapper.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(NAUTY_UTILS_DIR)/nauty_wrapper.cc
+
+nauty_wrapper_test.o : $(NAUTY_UTILS_DIR)/nauty_wrapper_test.cc \
+                       $(NAUTY_UTILS_DIR)/nauty_wrapper.h \
+                       $(GRAPH_UTILS_DIR)/graph.h $(GTEST_HEADERS) 
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(NAUTY_UTILS_DIR)/nauty_wrapper_test.cc
+
+nauty_wrapper_test.exe : graph.o nauty_wrapper.o nauty_wrapper_test.o gtest_main.a \
+                         $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
+                         $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

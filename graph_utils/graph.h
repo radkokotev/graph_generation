@@ -1,6 +1,6 @@
 // A representation of a simple graph.
-#ifndef GRAPH_UTILS_H_
-#define GRAPH_UTILS_H_
+#ifndef GRAPH_UTILS_GRAPH_H_
+#define GRAPH_UTILS_GRAPH_H_
 
 #include <string>
 #include <vector>
@@ -15,16 +15,18 @@ class Graph {
 public:
   Graph(int n);
   Graph(const vector<string> &adj_matrix);
+  virtual ~Graph() {}
 
-  void AddEdge(int v1, int v2);
-  bool HasEdge(int v1, int v2);
-  void GetAdjMatrix(vector<string> *v);
+  virtual void AddEdge(int v1, int v2);
+  virtual bool HasEdge(int v1, int v2) const;
+  virtual void GetAdjMatrix(vector<string> *v) const;
+  virtual int size() const;
 
 private:
-  int size;
+  int size_;
   std::unique_ptr<bool> adj_matrix_;
 };
 
 }  // namespace graph_utils
 
-#endif  // GRAPH_UTILS_H_
+#endif  // GRAPH_UTILS_GRAPH_H_
