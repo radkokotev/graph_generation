@@ -33,7 +33,6 @@ bool IsomorphismChecker::AreIsomorphic(const Graph &graph_a,
   DYNALLSTAT(int, lab2, lab2_sz);
   DYNALLSTAT(int, ptn, ptn_sz);
   DYNALLSTAT(int, orbits, orbits_sz);
-  DYNALLSTAT(int, map, map_sz);
   DYNALLSTAT(graph, g1, g1_sz);
   DYNALLSTAT(graph, g2, g2_sz);
   DYNALLSTAT(graph, cg1, cg1_sz);
@@ -51,7 +50,6 @@ bool IsomorphismChecker::AreIsomorphic(const Graph &graph_a,
   DYNALLOC1(int, lab2, lab2_sz, n, "malloc");
   DYNALLOC1(int, ptn, ptn_sz, n, "malloc");
   DYNALLOC1(int, orbits, orbits_sz, n, "malloc");
-  DYNALLOC1(int, map, map_sz, n, "malloc");
   DYNALLOC2(graph, g1, g1_sz, n, m, "malloc");
   DYNALLOC2(graph, g2, g2_sz, n, m, "malloc");
   DYNALLOC2(graph, cg1, cg1_sz, n, m, "malloc");

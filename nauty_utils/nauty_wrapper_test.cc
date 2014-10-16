@@ -1,9 +1,14 @@
 
+#include <fstream>
 #include "nauty_wrapper.h"
 #include "gtest/gtest.h"
 
 namespace nauty_utils {
 namespace {
+
+const char *kGraphsSize22FileName = "nauty_utils/testdata/F22_5_4.3.3.txt";
+const char *kGraphsSize24FileName = "nauty_utils/testdata/mike24.txt";
+const char *kGraphsSize32FileName = "nauty_utils/testdata/mike32.txt";
 
 void ExpectVectorsEq(const vector<string> &v1, const vector<string> v2) {
   ASSERT_EQ(v1.size(), v2.size());
@@ -17,6 +22,25 @@ void ExpectVectorsEq(const vector<string> &v1, const vector<string> v2) {
 class IsomorphismCheckerTest : public testing::Test {
 protected:
   virtual void SetUp() { checker_.reset(new IsomorphismChecker(true)); }
+
+  void AddGraphToCheckFromFile(const string& filename) {
+    std::ifstream infile(filename);
+    string s;
+    vector<string> mat;
+
+    while ((infile >> s)) {
+      if (!s.empty()) {
+        mat.push_back(s);
+      }
+      if (s.size() == mat.size() && mat.size() > 0) {
+        Graph *g = new Graph(mat);
+        mat.clear();
+        checker_->AddGraphToCheck(g);
+      }
+      ASSERT_LE(mat.size(), s.size());
+    }
+  }
+
   std::unique_ptr<IsomorphismChecker> checker_;
 };
 
@@ -95,6 +119,30 @@ TEST_F(IsomorphismCheckerTest, ThreeGraph_TwoIsomorphic) {
     graphs[1]->GetAdjMatrix(&result_matrix);
     ExpectVectorsEq(v2, result_matrix);
   }
+}
+
+TEST_F(IsomorphismCheckerTest, RealData_22) {
+  AddGraphToCheckFromFile(kGraphsSize22FileName);
+  vector<Graph *> result;
+  checker_->GetAllNonIsomorphicGraphs(&result);
+  // There are three non-isomorphic graphs in this file.
+  EXPECT_EQ(3, result.size());
+}
+
+TEST_F(IsomorphismCheckerTest, RealData_24) {
+  AddGraphToCheckFromFile(kGraphsSize24FileName);
+  vector<Graph *> result;
+  checker_->GetAllNonIsomorphicGraphs(&result);
+  // There is one non-isomorphic graph in this file.
+  EXPECT_EQ(1, result.size());
+}
+
+TEST_F(IsomorphismCheckerTest, RealData_32) {
+  AddGraphToCheckFromFile(kGraphsSize32FileName);
+  vector<Graph *> result;
+  checker_->GetAllNonIsomorphicGraphs(&result);
+  // There is one non-isomorphic graph in this file.
+  EXPECT_EQ(1, result.size());
 }
 
 } // namespace nauty_utils
