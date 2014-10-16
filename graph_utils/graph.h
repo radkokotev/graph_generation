@@ -27,6 +27,6 @@ private:
   std::unique_ptr<bool> adj_matrix_;
 };
 
-}  // namespace graph_utils
+} // namespace graph_utils
 
-#endif  // GRAPH_UTILS_GRAPH_H_
+#endif // GRAPH_UTILS_GRAPH_H_

@@ -10,7 +10,7 @@ const char *kGraphsSize22FileName = "nauty_utils/testdata/F22_5_4.3.3.txt";
 const char *kGraphsSize24FileName = "nauty_utils/testdata/mike24.txt";
 const char *kGraphsSize32FileName = "nauty_utils/testdata/mike32.txt";
 
-void ExpectVectorsEq(const vector<string> &v1, const vector<string> v2) {
+void ExpectVectorsEq(const vector<string> &v1, const vector<string> &v2) {
   ASSERT_EQ(v1.size(), v2.size());
   for (uint i = 0; i < v1.size(); ++i) {
     EXPECT_EQ(v1[i], v2[i]);
@@ -23,7 +23,7 @@ class IsomorphismCheckerTest : public testing::Test {
 protected:
   virtual void SetUp() { checker_.reset(new IsomorphismChecker(true)); }
 
-  void AddGraphToCheckFromFile(const string& filename) {
+  void AddGraphToCheckFromFile(const string &filename) {
     std::ifstream infile(filename);
     string s;
     vector<string> mat;

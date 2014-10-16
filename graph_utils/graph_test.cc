@@ -5,14 +5,14 @@
 namespace graph_utils {
 namespace {
 
-void ExpectVectorsEq(const vector<string> &v1, const vector<string> v2) {
+void ExpectVectorsEq(const vector<string> &v1, const vector<string> &v2) {
   ASSERT_EQ(v1.size(), v2.size());
   for (uint i = 0; i < v1.size(); ++i) {
     EXPECT_EQ(v1[i], v2[i]);
   }
 }
 
-}  // namespace
+} // namespace
 
 TEST(GraphTest, NoEdges) {
   vector<string> v({ "000", "000", "000" });

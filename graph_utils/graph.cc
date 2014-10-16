@@ -44,8 +44,6 @@ void Graph::GetAdjMatrix(vector<string> *v) const {
   }
 }
 
-int Graph::size() const {
-  return size_;
-}
+int Graph::size() const { return size_; }
 
-}  // namespace graph_utils
+} // namespace graph_utils
