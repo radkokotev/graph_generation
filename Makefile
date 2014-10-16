@@ -31,7 +31,7 @@ CXXFLAGS += -std=c++0x -g -Wall -Wextra -pthread
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = graph_test.exe nauty_wrapper_test.exe
+TESTS = graph_test.exe graph_generator_test.exe nauty_wrapper_test.exe 
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -83,6 +83,19 @@ graph_test.o : $(GRAPH_UTILS_DIR)/graph_test.cc \
 
 graph_test.exe : graph.o graph_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+graph_generator.o : $(GRAPH_UTILS_DIR)/graph_generator.cc \
+                    $(GRAPH_UTILS_DIR)/graph_generator.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph_generator.cc
+
+graph_generator_test.o : $(GRAPH_UTILS_DIR)/graph_generator_test.cc \
+                         $(GRAPH_UTILS_DIR)/graph_generator.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph_generator_test.cc
+
+graph_generator_test.exe : graph_generator.o graph_generator_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+
 
 # core nauty
 $(NAUTY_DIR)/nauty.o : $(NAUTY_DIR)/nauty.c $(NAUTY_DIR)/nauty.h

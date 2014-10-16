@@ -46,14 +46,15 @@ bool IsomorphismChecker::AreIsomorphic(const Graph &graph_a,
   int m = SETWORDSNEEDED(n);
   nauty_check(WORDSIZE, m, n, NAUTYVERSIONID);
 
-  DYNALLOC1(int, lab1, lab1_sz, n, "malloc");
-  DYNALLOC1(int, lab2, lab2_sz, n, "malloc");
-  DYNALLOC1(int, ptn, ptn_sz, n, "malloc");
-  DYNALLOC1(int, orbits, orbits_sz, n, "malloc");
-  DYNALLOC2(graph, g1, g1_sz, n, m, "malloc");
-  DYNALLOC2(graph, g2, g2_sz, n, m, "malloc");
-  DYNALLOC2(graph, cg1, cg1_sz, n, m, "malloc");
-  DYNALLOC2(graph, cg2, cg2_sz, n, m, "malloc");
+  char *malloc_name = "malloc";
+  DYNALLOC1(int, lab1, lab1_sz, n, malloc_name);
+  DYNALLOC1(int, lab2, lab2_sz, n, malloc_name);
+  DYNALLOC1(int, ptn, ptn_sz, n, malloc_name);
+  DYNALLOC1(int, orbits, orbits_sz, n, malloc_name);
+  DYNALLOC2(graph, g1, g1_sz, n, m, malloc_name);
+  DYNALLOC2(graph, g2, g2_sz, n, m, malloc_name);
+  DYNALLOC2(graph, cg1, cg1_sz, n, m, malloc_name);
+  DYNALLOC2(graph, cg2, cg2_sz, n, m, malloc_name);
 
   // Make the graphs.
 
