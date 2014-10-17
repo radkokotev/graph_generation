@@ -3,12 +3,15 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <algorithm>
 #include <vector>
+#include <set>
 #include <stdexcept>
 
 namespace graph_utils {
 
 SimpleGraphGenerator::SimpleGraphGenerator() {}
+
 bool SimpleGraphGenerator::IsGraphicalDegreeSeq(const std::vector<int> &seq) {
   int sum = 0;
   for (int i = 0; i < seq.size(); ++i) {
@@ -39,6 +42,52 @@ bool SimpleGraphGenerator::IsGraphicalDegreeSeq(const std::vector<int> &seq) {
     }
   }
   return true;
+}
+
+void SimpleGraphGenerator::ReduceDegreeSequence(
+    const int vertex, const std::vector<int> &incident_vertices,
+    std::vector<int> *seq) {
+  if (vertex >= seq->size() || vertex < 0) {
+    throw std::invalid_argument("Vertex out of bounds.");
+  }
+  if ((*seq)[vertex] != incident_vertices.size()) {
+    throw std::invalid_argument("Mismatching number of incident vertices.");
+  }
+  (*seq)[vertex] = 0;
+  for (int i = 0; i < incident_vertices.size(); ++i) {
+    if (incident_vertices[i] >= seq->size() || incident_vertices[i] < 0) {
+      throw std::invalid_argument("Incident vertex out of bounds.");
+    }
+    (*seq)[incident_vertices[i]]--;
+    if ((*seq)[incident_vertices[i]] < 0) {
+      throw std::invalid_argument("Invalid incident vertex.");
+    }
+  }
+}
+
+bool SimpleGraphGenerator::CGTest(const int vertex,
+                                  const std::set<int> &forbidden,
+                                  const std::vector<int> &seq) {
+  if (vertex >= seq.size() || vertex < 0) {
+    throw std::invalid_argument("Vertex out of bounds.");
+  }
+  std::vector<int> leftmost_adj_set;
+  const int kAdjSetSize = seq[vertex];
+  for (int i = 0; i < seq.size() && leftmost_adj_set.size() < kAdjSetSize;
+      ++i) {
+    if (forbidden.find(i) != forbidden.end() || i == vertex) {;
+      continue;
+    }
+    leftmost_adj_set.push_back(i);
+  }
+  if (leftmost_adj_set.size() < kAdjSetSize) {
+    // There were not enough edges to connect.
+    return false;
+  }
+  std::vector<int> reduced_seq(seq);
+  ReduceDegreeSequence(vertex, leftmost_adj_set, &reduced_seq);
+  std::sort(reduced_seq.begin(), reduced_seq.end(), std::greater<int>());
+  return IsGraphicalDegreeSeq(reduced_seq);
 }
 
 } // namespace graph_utils
