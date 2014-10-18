@@ -27,5 +27,9 @@
 *.out
 *.app
 
+# Folders
+gtest-1.7.0/
+nauty/
+
 # Temporary files
 *~
