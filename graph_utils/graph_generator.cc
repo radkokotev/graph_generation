@@ -9,6 +9,8 @@
 #include <stdexcept>
 #include <utility>
 
+#include "graph.h"
+
 using std::vector;
 using std::set;
 using std::pair;
@@ -145,6 +147,53 @@ void SimpleGraphGenerator::GenerateAllAdjSets(const vector<int> &original_seq,
       GenerateAllAdjSets(original_seq, cur_set, adj_sets);
     }
     cur_set->erase(vertex);  // Remove the vertex, which was temporarily added.
+  }
+}
+
+void SimpleGraphGenerator::GenerateAllGraphs(const vector<int> &seq,
+                                             vector<Graph> *graphs) {
+  Graph g(seq.size());
+  vector<pair<int, int>> new_seq;
+  for (int i = 0; i < seq.size(); ++i) {
+    new_seq.push_back(make_pair(seq[i], i));
+  }
+  GenerateAllGraphs(new_seq, &g, graphs);
+}
+
+void SimpleGraphGenerator::GenerateAllGraphs(
+    const vector<pair<int, int>> &seq,  // [ (deg, vertex), (deg, vertex), ...]
+    Graph *g,
+    vector<Graph> *graphs) {
+  if (seq.front().first <= 0) {
+    graphs->push_back(*g);
+    return;
+  }
+  vector<int> helper_seq;
+  for (int i = 0; i < seq.size(); ++i) {
+    if (seq[i].first <= 0) {
+      break;
+    }
+    helper_seq.push_back(seq[i].first);
+  }
+  set<int> helper_set;
+  vector<set<int>> adj_sets;
+  GenerateAllAdjSets(helper_seq, &helper_set, &adj_sets);
+  for (int i = 0; i < adj_sets.size(); ++i) {
+    const set<int> &curr_set = adj_sets[i];
+
+    vector<pair<int, int>> new_seq(seq);
+    new_seq[0].first = 0;
+    for (auto it = curr_set.cbegin(); it != curr_set.cend(); ++it) {
+      g->AddEdge(seq[0].second, seq[*it].second);  // Add temporary edges
+      --new_seq[*it].first;  // reduce degree sequence
+    }
+
+    std::sort(new_seq.rbegin(), new_seq.rend());  // reverse sort
+    GenerateAllGraphs(new_seq, g, graphs);
+
+    for (auto it = curr_set.cbegin(); it != curr_set.cend(); ++it) {
+      g->RemoveEdge(seq[0].second, seq[*it].second);  // remove temp edges
+    }
   }
 }
 

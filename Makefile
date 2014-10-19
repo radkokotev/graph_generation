@@ -92,7 +92,7 @@ graph_generator_test.o : $(GRAPH_UTILS_DIR)/graph_generator_test.cc \
                          $(GRAPH_UTILS_DIR)/graph_generator.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph_generator_test.cc
 
-graph_generator_test.exe : graph_generator.o graph_generator_test.o gtest_main.a
+graph_generator_test.exe : graph_generator.o graph_generator_test.o graph.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 

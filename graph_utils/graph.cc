@@ -11,6 +11,12 @@ Graph::Graph(int n) {
   memset(adj_matrix_.get(), 0, n * n);
 }
 
+Graph::Graph(const Graph& g) {
+  size_ = g.size();
+  adj_matrix_.reset((bool *)malloc(sizeof(bool) * size_ * size_));
+  memcpy(adj_matrix_.get(), g.adj_matrix_.get(), sizeof(bool) * size_ * size_);
+}
+
 Graph::Graph(const vector<string> &adj_matrix) {
   const int n = adj_matrix.size();
   size_ = n;
@@ -31,6 +37,11 @@ bool Graph::HasEdge(int v1, int v2) const {
 void Graph::AddEdge(int v1, int v2) {
   adj_matrix_.get()[v1 * size_ + v2] = true;
   adj_matrix_.get()[v2 * size_ + v1] = true;
+}
+
+void Graph::RemoveEdge(int v1, int v2) {
+  adj_matrix_.get()[v1 * size_ + v2] = false;
+  adj_matrix_.get()[v2 * size_ + v1] = false;
 }
 
 void Graph::GetAdjMatrix(vector<string> *v) const {

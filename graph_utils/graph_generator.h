@@ -6,6 +6,8 @@
 #include <utility>
 #include <vector>
 
+#include "graph.h"
+
 namespace graph_utils {
 
 class SimpleGraphGenerator {
@@ -33,6 +35,14 @@ public:
   static void GenerateAllAdjSets(const std::vector<int> &original_seq,
                                  std::set<int> *cur_set,
                                  std::vector<std::set<int>> *adj_sets);
+
+  void GenerateAllGraphs(const std::vector<int> &seq,
+                         std::vector<Graph> *graphs);
+
+private:
+  void GenerateAllGraphs(const std::vector<std::pair<int, int>> &seq,
+                         Graph *g,
+                         std::vector<Graph> *graphs);
 };
 
 } // namespace graph_utils

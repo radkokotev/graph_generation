@@ -4,6 +4,7 @@
 #include <vector>
 #include <set>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 #include "graph_generator.h"
@@ -13,8 +14,19 @@ using std::vector;
 using std::set;
 using std::pair;
 using std::make_pair;
+using std::string;
 
 namespace graph_utils {
+namespace {
+
+void ExpectVectorsEq(const vector<string> &v1, const vector<string> &v2) {
+  ASSERT_EQ(v1.size(), v2.size());
+  for (uint i = 0; i < v1.size(); ++i) {
+    EXPECT_EQ(v1[i], v2[i]);
+  }
+}
+
+} // namespace
 
 class SimpleGraphGeneratorTest : public testing::Test {
 protected:
@@ -141,5 +153,21 @@ TEST_F(SimpleGraphGeneratorTest, GenerateAllAdjSetsTest2) {
   EXPECT_EQ(1, *(it2++));
   EXPECT_EQ(2, *it2);
 }
+
+TEST_F(SimpleGraphGeneratorTest, GenerateAllGraphs) {
+  vector<int> seq({ 2, 2, 1, 1 });
+  vector<Graph> v;
+  generator_->GenerateAllGraphs(seq, &v);
+  ASSERT_EQ(2, v.size());
+  vector<string> expected1({"0101", "1010", "0100", "1000"});
+  vector<string> expected2({"0110", "1001", "1000", "0100"});
+  vector<string> result1;
+  vector<string> result2;
+  v[0].GetAdjMatrix(&result1);
+  v[1].GetAdjMatrix(&result2);
+  ExpectVectorsEq(expected1, result1);
+  ExpectVectorsEq(expected2, result2);
+}
+
 
 } // namespace graph_utils
