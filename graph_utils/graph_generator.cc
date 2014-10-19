@@ -1,18 +1,24 @@
-
+// Implementation of SimpleGraphGenerator
 #include "graph_generator.h"
 
+#include <algorithm>
 #include <stdlib.h>
 #include <stdio.h>
-#include <algorithm>
 #include <vector>
 #include <set>
 #include <stdexcept>
+#include <utility>
+
+using std::vector;
+using std::set;
+using std::pair;
+using std::make_pair;
 
 namespace graph_utils {
 
 SimpleGraphGenerator::SimpleGraphGenerator() {}
 
-bool SimpleGraphGenerator::IsGraphicalDegreeSeq(const std::vector<int> &seq) {
+bool SimpleGraphGenerator::IsGraphicalDegreeSeq(const vector<int> &seq) {
   int sum = 0;
   for (int i = 0; i < seq.size(); ++i) {
     sum += seq[i];
@@ -45,8 +51,8 @@ bool SimpleGraphGenerator::IsGraphicalDegreeSeq(const std::vector<int> &seq) {
 }
 
 void SimpleGraphGenerator::ReduceDegreeSequence(
-    const int vertex, const std::vector<int> &incident_vertices,
-    std::vector<int> *seq) {
+    const int vertex, const vector<int> &incident_vertices,
+    vector<int> *seq) {
   if (vertex >= seq->size() || vertex < 0) {
     throw std::invalid_argument("Vertex out of bounds.");
   }
@@ -66,16 +72,15 @@ void SimpleGraphGenerator::ReduceDegreeSequence(
 }
 
 bool SimpleGraphGenerator::CGTest(const int vertex,
-                                  const std::set<int> &forbidden,
-                                  const std::vector<int> &seq) {
-  if (vertex >= seq.size() || vertex < 0) {
+                                  const vector<pair<int, bool>> &seq_allowed) {
+  if (vertex >= seq_allowed.size() || vertex < 0) {
     throw std::invalid_argument("Vertex out of bounds.");
   }
-  std::vector<int> leftmost_adj_set;
-  const int kAdjSetSize = seq[vertex];
-  for (int i = 0; i < seq.size() && leftmost_adj_set.size() < kAdjSetSize;
+  vector<int> leftmost_adj_set;
+  const int kAdjSetSize = seq_allowed[vertex].first;
+  for (int i = 0; i < seq_allowed.size() && leftmost_adj_set.size() < kAdjSetSize;
       ++i) {
-    if (forbidden.find(i) != forbidden.end() || i == vertex) {;
+    if (!seq_allowed[i].second || i == vertex) {;
       continue;
     }
     leftmost_adj_set.push_back(i);
@@ -84,10 +89,63 @@ bool SimpleGraphGenerator::CGTest(const int vertex,
     // There were not enough edges to connect.
     return false;
   }
-  std::vector<int> reduced_seq(seq);
+  vector<int> reduced_seq(seq_allowed.size(), 0);
+  for (int i = 0; i < seq_allowed.size(); ++i) {
+    reduced_seq[i] = seq_allowed[i].first;
+  }
   ReduceDegreeSequence(vertex, leftmost_adj_set, &reduced_seq);
   std::sort(reduced_seq.begin(), reduced_seq.end(), std::greater<int>());
   return IsGraphicalDegreeSeq(reduced_seq);
+}
+
+void SimpleGraphGenerator::GenerateAllAdjSets(const vector<int> &original_seq,
+                                              set<int> *cur_set,
+                                              vector<set<int>> *adj_sets) {
+  if (cur_set->size() >= original_seq[0]) {
+    // This set is complete.
+    adj_sets->push_back(*cur_set);
+    return;
+  }
+  int vertex = original_seq.size() - 1;
+  if (!cur_set->empty()) {
+    vertex = (*(cur_set->begin())) - 1;
+  }
+
+  if (vertex <= 0) {
+    // Invalid adjacency set.
+    return;
+  }
+
+  for (; vertex > 0; --vertex) {
+    cur_set->insert(vertex);  // Temporarily inset the vertex
+
+    int new_vertex_degree = original_seq[0] - cur_set->size();
+
+    // Create the sequence reduced by the newly introduced edge.
+    vector<pair<int, bool>> new_seq;
+
+    new_seq.push_back(make_pair(new_vertex_degree, false));
+    for (int i = 1; i < original_seq.size(); ++i) {
+      new_seq.push_back(make_pair(original_seq[i], true));
+    }
+    for (auto it = cur_set->cbegin(); it != cur_set->cend(); ++it) {
+      // All edges in the set are forbidden for new connections.
+      --new_seq[*it].first;
+      new_seq[*it].second = false;
+    }
+
+    std::sort(new_seq.rbegin(), new_seq.rend());  // reverse sort
+
+    int new_vertex_index = original_seq.size() - 1 -
+        (std::lower_bound(new_seq.rbegin(), new_seq.rend(),
+                         make_pair(new_vertex_degree, false)) -
+            new_seq.rbegin());
+
+    if (CGTest(new_vertex_index, new_seq)) {
+      GenerateAllAdjSets(original_seq, cur_set, adj_sets);
+    }
+    cur_set->erase(vertex);  // Remove the vertex, which was temporarily added.
+  }
 }
 
 } // namespace graph_utils

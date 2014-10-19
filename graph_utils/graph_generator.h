@@ -2,8 +2,9 @@
 // sequence. Based on Kim H.,  Toroczkai z., Erdos P., Miklos I., Szekely L.,
 // "Degree-based graph construction" http://arxiv.org/pdf/0905.4892
 
-#include <vector>
 #include <set>
+#include <utility>
+#include <vector>
 
 namespace graph_utils {
 
@@ -14,17 +15,24 @@ public:
   // Erdos-Gallai Theorem
   static bool IsGraphicalDegreeSeq(const std::vector<int> &seq);
 
-  // Returns true if the constrained graphicality test holds for the current
-  // given set of connections.
+  // Returns true if the constrained graphicality test holds for the given
+  // vertex. 'seq_allowed' is a degree sequence in non-increasing order and
+  // every boolean value represents if the vertex is allowed or restricted.
   static bool CGTest(const int vertex,
-                     const std::set<int> &forbidden,
-                     const std::vector<int> &seq);
+                     const std::vector<std::pair<int, bool>> &seq_allowed);
 
   // Reduces the degree sequence by removing 'vertex' from the graph and all
   // edges that are incident on that vertex.
   static void ReduceDegreeSequence(const int vertex,
                                    const std::vector<int> &incident_vertices,
                                    std::vector<int> *seq);
+
+  // Generates all valid adjacency sets for vertex 0. Expects a reverse sorted
+  // degree sequence, 'cur_set' needs to be empty initially and is altered.
+  // The resulting adjacency sets are appended to 'adj_sets'.
+  static void GenerateAllAdjSets(const std::vector<int> &original_seq,
+                                 std::set<int> *cur_set,
+                                 std::vector<std::set<int>> *adj_sets);
 };
 
 } // namespace graph_utils
