@@ -57,4 +57,11 @@ void Graph::GetAdjMatrix(vector<string> *v) const {
 
 int Graph::size() const { return size_; }
 
+Graph& Graph::operator=(const Graph &g) {
+  size_ = g.size();
+  adj_matrix_.reset((bool *)malloc(sizeof(bool) * size_ * size_));
+  memcpy(adj_matrix_.get(), g.adj_matrix_.get(), sizeof(bool) * size_ * size_);
+  return *this;
+}
+
 } // namespace graph_utils
