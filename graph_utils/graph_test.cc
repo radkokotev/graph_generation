@@ -72,4 +72,40 @@ TEST(GraphTest, GetAdjMatrix) {
   ExpectVectorsEq(expected2, mat2);
 }
 
+TEST(GraphTest, NotConnected) {
+  {
+    vector<string> v({ "000", "000", "000" });
+    Graph g(v);
+    EXPECT_FALSE(g.IsConnected());
+  }
+  {
+    vector<string> v({ "010", "100", "000" });
+    Graph g(v);
+    EXPECT_FALSE(g.IsConnected());
+  }
+}
+
+TEST(GraphTest, Connected) {
+  {
+    vector<string> v({ "010", "101", "010" });
+    Graph g(v);
+    EXPECT_TRUE(g.IsConnected());
+  }
+  {
+    vector<string> v({ "0111", "1011", "1101", "1110" });
+    Graph g(v);
+    EXPECT_TRUE(g.IsConnected());
+  }
+  {
+    vector<string> v({"0101", "1010", "0100", "1000"});
+    Graph g(v);
+    EXPECT_TRUE(g.IsConnected());
+  }
+  {
+    vector<string> v({"0110", "1001", "1000", "0100"});
+    Graph g(v);
+    EXPECT_TRUE(g.IsConnected());
+  }
+}
+
 } // namespace grap_utils

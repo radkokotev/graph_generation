@@ -23,6 +23,7 @@ public:
   virtual bool HasEdge(int v1, int v2) const;
   virtual void GetAdjMatrix(vector<string> *v) const;
   virtual int size() const;
+  virtual bool IsConnected() const;
   Graph& operator=(const Graph &g);
 
 private:

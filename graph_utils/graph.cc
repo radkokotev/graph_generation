@@ -2,6 +2,8 @@
 #include "graph.h"
 
 #include <cstring>
+#include <set>
+#include <queue>
 
 namespace graph_utils {
 
@@ -56,6 +58,26 @@ void Graph::GetAdjMatrix(vector<string> *v) const {
 }
 
 int Graph::size() const { return size_; }
+
+bool Graph::IsConnected() const {
+  std::set<int> visited_edges;
+  std::queue<int> q;
+  q.push(0);
+  visited_edges.insert(0);
+  while (!q.empty()) {
+    int cur_edge = q.front();
+    q.pop();
+    visited_edges.insert(cur_edge);
+    for (int neighbour = 0; neighbour < size(); ++neighbour) {
+      if (HasEdge(cur_edge, neighbour) &&
+          visited_edges.find(neighbour) == visited_edges.end()) {
+        visited_edges.insert(neighbour);
+        q.push(neighbour);
+      }
+    }
+  }
+  return visited_edges.size() == size();
+}
 
 Graph& Graph::operator=(const Graph &g) {
   size_ = g.size();
