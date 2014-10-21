@@ -4,4 +4,5 @@ make || {
 }
 ./graph_test.exe
 ./graph_generator_test.exe
+./graph_utilities_test.exe
 ./nauty_wrapper_test.exe

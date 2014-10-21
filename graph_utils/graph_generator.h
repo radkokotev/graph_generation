@@ -2,6 +2,9 @@
 // sequence. Based on Kim H.,  Toroczkai z., Erdos P., Miklos I., Szekely L.,
 // "Degree-based graph construction" http://arxiv.org/pdf/0905.4892
 
+#ifndef GRAPH_UTILS_GRAPH_GENERATOR_H_
+#define GRAPH_UTILS_GRAPH_GENERATOR_H_
+
 #include <set>
 #include <utility>
 #include <vector>
@@ -46,3 +49,5 @@ private:
 };
 
 } // namespace graph_utils
+
+#endif // GRAPH_UTILS_GRAPH_GENERATOR_H_
