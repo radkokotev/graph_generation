@@ -14,7 +14,7 @@ class IsomorphismChecker {
 public:
   IsomorphismChecker(bool keep_isomorphs);
 
-  void AddGraphToCheck(Graph *g);
+  bool AddGraphToCheck(Graph *g);
   void GetAllNonIsomorphicGraphs(vector<Graph *> *v);
   static bool AreIsomorphic(const Graph &g1, const Graph &g2);
 

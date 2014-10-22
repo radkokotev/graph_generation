@@ -197,4 +197,29 @@ void SimpleGraphGenerator::GenerateAllGraphs(
   }
 }
 
+void SimpleGraphGenerator::GenerateAllDegreeSequences(
+    const int n, vector<vector<int>> *seqs) {
+  vector<int> work_seq;
+  SimpleGraphGenerator::GenerateAllDegreeSequences(n, &work_seq, seqs);
+}
+
+void SimpleGraphGenerator::GenerateAllDegreeSequences(
+    const int n, vector<int> *cur_seq, vector<vector<int>> *seqs) {
+  if (cur_seq->size() >= n) {
+    seqs->push_back(*cur_seq);
+    return;
+  }
+  int m = n - 1;
+  if (!cur_seq->empty()) {
+    m = cur_seq->back();
+  }
+
+  cur_seq->push_back(0);
+  for (int i = m; i > 0; --i) {
+    (*cur_seq)[cur_seq->size() - 1] = i;
+    GenerateAllDegreeSequences(n, cur_seq, seqs);
+  }
+  cur_seq->erase(cur_seq->begin() + cur_seq->size() - 1);
+}
+
 } // namespace graph_utils

@@ -19,7 +19,8 @@ using std::string;
 namespace graph_utils {
 namespace {
 
-void ExpectVectorsEq(const vector<string> &v1, const vector<string> &v2) {
+template<typename T>
+void ExpectVectorsEq(const vector<T> &v1, const vector<T> &v2) {
   ASSERT_EQ(v1.size(), v2.size());
   for (uint i = 0; i < v1.size(); ++i) {
     EXPECT_EQ(v1[i], v2[i]);
@@ -154,10 +155,10 @@ TEST_F(SimpleGraphGeneratorTest, GenerateAllAdjSetsTest2) {
   EXPECT_EQ(2, *it2);
 }
 
-TEST_F(SimpleGraphGeneratorTest, GenerateAllGraphs) {
+TEST_F(SimpleGraphGeneratorTest, GenerateAllGraphsByDegreeSeq) {
   vector<int> seq({ 2, 2, 1, 1 });
   vector<Graph> v;
-  generator_->GenerateAllGraphs(seq, &v);
+  SimpleGraphGenerator::GenerateAllGraphs(seq, &v);
   ASSERT_EQ(2, v.size());
   vector<string> expected1({"0101", "1010", "0100", "1000"});
   vector<string> expected2({"0110", "1001", "1000", "0100"});
@@ -165,9 +166,30 @@ TEST_F(SimpleGraphGeneratorTest, GenerateAllGraphs) {
   vector<string> result2;
   v[0].GetAdjMatrix(&result1);
   v[1].GetAdjMatrix(&result2);
-  ExpectVectorsEq(expected1, result1);
-  ExpectVectorsEq(expected2, result2);
+  ExpectVectorsEq<string>(expected1, result1);
+  ExpectVectorsEq<string>(expected2, result2);
 }
 
+TEST_F(SimpleGraphGeneratorTest, GenerateAllDegreeSeqs) {
+  {
+    vector<vector<int>> seqs;
+    SimpleGraphGenerator::GenerateAllDegreeSequences(3, &seqs);
+    vector<vector<int>> expected({ {2,2,2}, {2,2,1}, {2,1,1}, {1,1,1} });
+    for (int i = 0; i < seqs.size(); ++i) {
+      ExpectVectorsEq<int>(expected[i], seqs[i]);
+    }
+  }
+  {
+    vector<vector<int>> seqs;
+    SimpleGraphGenerator::GenerateAllDegreeSequences(4, &seqs);
+    vector<vector<int>> expected({
+        {3,3,3,3}, {3,3,3,2}, {3,3,3,1}, {3,3,2,2}, {3,3,2,1},
+        {3,3,1,1}, {3,2,2,2}, {3,2,2,1}, {3,2,1,1}, {3,1,1,1},
+        {2,2,2,2}, {2,2,2,1}, {2,2,1,1}, {2,1,1,1}, {1,1,1,1} });
+    for (int i = 0; i < seqs.size(); ++i) {
+      ExpectVectorsEq<int>(expected[i], seqs[i]);
+    }
+  }
+}
 
 } // namespace graph_utils

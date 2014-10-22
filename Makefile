@@ -20,6 +20,7 @@ NAUTY_DIR = nauty
 # Where to find user code.
 GRAPH_UTILS_DIR = graph_utils
 NAUTY_UTILS_DIR = nauty_utils
+MAIN_DIR = main
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
@@ -32,7 +33,9 @@ CXXFLAGS += -std=c++0x -g -Wall -Wextra -pthread
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
 TESTS = graph_test.exe graph_generator_test.exe graph_utilities_test.exe \
-        nauty_wrapper_test.exe 
+        nauty_wrapper_test.exe
+
+MAINS = diamond_free_graphs.exe
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -41,7 +44,7 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 # House-keeping build targets.
 
-all : $(TESTS)
+all : $(TESTS) $(MAINS)
 
 clean :
 	rm -f $(TESTS) gtest.a gtest_main.a *.o
@@ -109,8 +112,6 @@ graph_utilities_test.exe : graph_utilities.o graph_utilities_test.o graph_genera
                            $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-
-
 # core nauty
 $(NAUTY_DIR)/nauty.o : $(NAUTY_DIR)/nauty.c $(NAUTY_DIR)/nauty.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(NAUTY_DIR)/nauty.c
@@ -140,3 +141,12 @@ nauty_wrapper_test.exe : graph.o nauty_wrapper.o nauty_wrapper_test.o gtest_main
                          $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
                          $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+# main
+diamond_free_graphs.o : $(MAIN_DIR)/diamond_free_graphs.cc
+	$(CXX) $(CPPFLAGS) -ggdb $(CXXFLAGS) -c $(MAIN_DIR)/diamond_free_graphs.cc
+
+diamond_free_graphs.exe : diamond_free_graphs.o graph_utilities.o graph_generator.o graph.o nauty_wrapper.o \
+                          $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
+                          $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
+	$(CXX) $(CPPFLAGS) -ggdb $(CXXFLAGS) -lpthread $^ -o $@

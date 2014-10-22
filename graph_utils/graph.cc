@@ -60,23 +60,23 @@ void Graph::GetAdjMatrix(vector<string> *v) const {
 int Graph::size() const { return size_; }
 
 bool Graph::IsConnected() const {
-  std::set<int> visited_edges;
+  std::set<int> visited_nodes;
   std::queue<int> q;
   q.push(0);
-  visited_edges.insert(0);
+  visited_nodes.insert(0);
   while (!q.empty()) {
     int cur_edge = q.front();
     q.pop();
-    visited_edges.insert(cur_edge);
+    visited_nodes.insert(cur_edge);
     for (int neighbour = 0; neighbour < size(); ++neighbour) {
       if (HasEdge(cur_edge, neighbour) &&
-          visited_edges.find(neighbour) == visited_edges.end()) {
-        visited_edges.insert(neighbour);
+          visited_nodes.find(neighbour) == visited_nodes.end()) {
+        visited_nodes.insert(neighbour);
         q.push(neighbour);
       }
     }
   }
-  return visited_edges.size() == size();
+  return visited_nodes.size() == size();
 }
 
 Graph& Graph::operator=(const Graph &g) {

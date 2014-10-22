@@ -47,7 +47,7 @@ protected:
 TEST_F(IsomorphismCheckerTest, OneGraph) {
   vector<string> v({ "000", "000", "000" });
   Graph g(v);
-  checker_->AddGraphToCheck(&g);
+  ASSERT_TRUE(checker_->AddGraphToCheck(&g));
   vector<Graph *> graphs;
   checker_->GetAllNonIsomorphicGraphs(&graphs);
   ASSERT_EQ(1, graphs.size());
@@ -61,8 +61,8 @@ TEST_F(IsomorphismCheckerTest, TwoNonIsomorphicGraphs) {
   vector<string> v2({ "010", "100", "000" });
   Graph g1(v1);
   Graph g2(v2);
-  checker_->AddGraphToCheck(&g1);
-  checker_->AddGraphToCheck(&g2);
+  ASSERT_TRUE(checker_->AddGraphToCheck(&g1));
+  ASSERT_TRUE(checker_->AddGraphToCheck(&g2));
 
   vector<Graph *> graphs;
   checker_->GetAllNonIsomorphicGraphs(&graphs);
@@ -84,8 +84,8 @@ TEST_F(IsomorphismCheckerTest, TwoIsomorphicGraphs) {
   vector<string> v2({ "010", "100", "000" });
   Graph g1(v1);
   Graph g2(v2);
-  checker_->AddGraphToCheck(&g1);
-  checker_->AddGraphToCheck(&g2);
+  ASSERT_TRUE(checker_->AddGraphToCheck(&g1));
+  ASSERT_FALSE(checker_->AddGraphToCheck(&g2));
 
   vector<Graph *> graphs;
   checker_->GetAllNonIsomorphicGraphs(&graphs);
@@ -102,9 +102,9 @@ TEST_F(IsomorphismCheckerTest, ThreeGraph_TwoIsomorphic) {
   Graph g1(v1);
   Graph g2(v2);
   Graph g3(v3);
-  checker_->AddGraphToCheck(&g1);
-  checker_->AddGraphToCheck(&g2);
-  checker_->AddGraphToCheck(&g3);
+  ASSERT_TRUE(checker_->AddGraphToCheck(&g1));
+  ASSERT_TRUE(checker_->AddGraphToCheck(&g2));
+  ASSERT_FALSE(checker_->AddGraphToCheck(&g3));
 
   vector<Graph *> graphs;
   checker_->GetAllNonIsomorphicGraphs(&graphs);
