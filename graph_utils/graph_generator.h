@@ -40,7 +40,7 @@ public:
                                  std::vector<std::set<int>> *adj_sets);
 
   static void GenerateAllGraphs(const std::vector<int> &seq,
-                                std::vector<Graph> *graphs);
+                                std::vector<Graph *> *graphs);
 
   static void GenerateAllDegreeSequences(const int n,
                                          std::vector<std::vector<int>> *seqs);
@@ -48,7 +48,7 @@ public:
 private:
   static void GenerateAllGraphs(const std::vector<std::pair<int, int>> &seq,
                                 Graph *g,
-                                std::vector<Graph> *graphs);
+                                std::vector<Graph *> *graphs);
 
   static void GenerateAllDegreeSequences(const int n,
                                          std::vector<int> *cur_seq,

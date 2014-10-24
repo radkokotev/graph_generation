@@ -33,3 +33,5 @@ nauty/
 
 # Temporary files
 *~
+*.txt
+

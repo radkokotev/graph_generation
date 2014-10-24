@@ -157,15 +157,15 @@ TEST_F(SimpleGraphGeneratorTest, GenerateAllAdjSetsTest2) {
 
 TEST_F(SimpleGraphGeneratorTest, GenerateAllGraphsByDegreeSeq) {
   vector<int> seq({ 2, 2, 1, 1 });
-  vector<Graph> v;
+  vector<Graph *> v;
   SimpleGraphGenerator::GenerateAllGraphs(seq, &v);
   ASSERT_EQ(2, v.size());
   vector<string> expected1({"0101", "1010", "0100", "1000"});
   vector<string> expected2({"0110", "1001", "1000", "0100"});
   vector<string> result1;
   vector<string> result2;
-  v[0].GetAdjMatrix(&result1);
-  v[1].GetAdjMatrix(&result2);
+  v[0]->GetAdjMatrix(&result1);
+  v[1]->GetAdjMatrix(&result2);
   ExpectVectorsEq<string>(expected1, result1);
   ExpectVectorsEq<string>(expected2, result2);
 }

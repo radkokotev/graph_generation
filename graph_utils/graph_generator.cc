@@ -151,7 +151,7 @@ void SimpleGraphGenerator::GenerateAllAdjSets(const vector<int> &original_seq,
 }
 
 void SimpleGraphGenerator::GenerateAllGraphs(const vector<int> &seq,
-                                             vector<Graph> *graphs) {
+                                             vector<Graph *> *graphs) {
   Graph g(seq.size());
   vector<pair<int, int>> new_seq;
   for (int i = 0; i < seq.size(); ++i) {
@@ -163,9 +163,9 @@ void SimpleGraphGenerator::GenerateAllGraphs(const vector<int> &seq,
 void SimpleGraphGenerator::GenerateAllGraphs(
     const vector<pair<int, int>> &seq,  // [ (deg, vertex), (deg, vertex), ...]
     Graph *g,
-    vector<Graph> *graphs) {
+    vector<Graph *> *graphs) {
   if (seq.front().first <= 0) {
-    graphs->push_back(*g);
+    graphs->push_back(new Graph(*g));
     return;
   }
   vector<int> helper_seq;

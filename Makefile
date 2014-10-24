@@ -28,7 +28,7 @@ MAIN_DIR = main
 CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem ./
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -std=c++0x -g -Wall -Wextra -pthread
+CXXFLAGS += -std=c++0x -g -Wall -Wextra -pthread -O3
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
@@ -144,9 +144,9 @@ nauty_wrapper_test.exe : graph.o nauty_wrapper.o nauty_wrapper_test.o gtest_main
 
 # main
 diamond_free_graphs.o : $(MAIN_DIR)/diamond_free_graphs.cc
-	$(CXX) $(CPPFLAGS) -ggdb $(CXXFLAGS) -c $(MAIN_DIR)/diamond_free_graphs.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(MAIN_DIR)/diamond_free_graphs.cc
 
 diamond_free_graphs.exe : diamond_free_graphs.o graph_utilities.o graph_generator.o graph.o nauty_wrapper.o \
                           $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
                           $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
-	$(CXX) $(CPPFLAGS) -ggdb $(CXXFLAGS) -lpthread $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

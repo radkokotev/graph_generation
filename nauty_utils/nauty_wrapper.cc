@@ -20,7 +20,7 @@ bool IsomorphismChecker::AddGraphToCheck(Graph *g) {
   return true;
 }
 
-void IsomorphismChecker::GetAllNonIsomorphicGraphs(vector<Graph *> *v) {
+void IsomorphismChecker::GetAllNonIsomorphicGraphs(vector<Graph *> *v) const {
   v->insert(v->begin(), graphs_.begin(), graphs_.end());
 }
 
