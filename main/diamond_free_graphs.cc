@@ -44,6 +44,7 @@ void ExportGraphsToFile(const string &filename,
     for (int j = 0; j < matrix.size(); ++j) {
       f << matrix[j] << std::endl;
     }
+    delete graphs[i];
     f << std::endl;
   }
   f.close();
@@ -81,7 +82,9 @@ int main() {
   vector<vector<int>> seqs;
   std::clock_t start = std::clock();
   SimpleGraphGenerator::GenerateAllDegreeSequences(kNumberOfVertices, &seqs);
+  printf("Total seqs are %d\n", seqs.size());
   for (int i = 0; i < seqs.size(); ++i) {
+    if (i%1000 == 0) printf("Done with %d\n", i);
     ExportAllNonIsomorphicGraphsForSequence(seqs[i]);
   }
 

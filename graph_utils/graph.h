@@ -16,7 +16,7 @@ public:
   Graph(int n);
   Graph(const Graph& g);
   Graph(const vector<string> &adj_matrix);
-  virtual ~Graph() {}
+  virtual ~Graph() {} 
 
   virtual void AddEdge(int v1, int v2);
   virtual void RemoveEdge(int v1, int v2);
@@ -28,7 +28,7 @@ public:
 
 private:
   int size_;
-  std::unique_ptr<bool> adj_matrix_;
+  std::vector<bool> adj_matrix_;
 };
 
 } // namespace graph_utils
