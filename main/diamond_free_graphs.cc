@@ -44,7 +44,6 @@ void ExportGraphsToFile(const string &filename,
     for (int j = 0; j < matrix.size(); ++j) {
       f << matrix[j] << std::endl;
     }
-    delete graphs[i];
     f << std::endl;
   }
   f.close();
@@ -60,19 +59,21 @@ void ExportAllNonIsomorphicGraphsForSequence(const vector<int> &seq) {
   IsomorphismChecker checker(true);
   for (int i = 0; i < all_graphs.size(); ++i) {
     if (all_graphs[i]->IsConnected() &&
-        DiamondFreeGraph::IsDiamondFree(*all_graphs[i])) {
+        DiamondFreeGraph::IsDiamondFree(*(all_graphs[i]))) {
       ++all_connected_diamond_free_count;
       if (checker.AddGraphToCheck(all_graphs[i])) {
         ++final_count;
         should_export = true;
-      } else {
-        delete all_graphs[i];
-        all_graphs[i] = NULL;
       }
     }
   }
   if (should_export) {
     ExportGraphsToFile(kExportFileName, checker);
+  }
+
+  while(!all_graphs.empty()) {
+    delete all_graphs.back();
+    all_graphs.pop_back();
   }
 }
 
