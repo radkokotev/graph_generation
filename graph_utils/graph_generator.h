@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "graph.h"
+#include "graph_utilities.h"
 
 namespace graph_utils {
 
@@ -43,6 +44,7 @@ public:
                                 std::vector<Graph *> *graphs);
 
   static void GenerateAllUniqueGraphs(const std::vector<int> &seq,
+                                      GraphFilter *filter,
                                       std::vector<Graph *> *graphs);
 
   static void GenerateAllDegreeSequences(const int n,
@@ -51,6 +53,7 @@ public:
 private:
   static void GenerateAllGraphs(const std::vector<std::pair<int, int>> &seq,
                                 const bool unique_graphs_only,
+                                GraphFilter *filter,
                                 Graph *g,
                                 std::vector<Graph *> *graphs);
 

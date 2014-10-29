@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "graph_generator.h"
+#include "graph_utilities.h"
 #include "gtest/gtest.h"
 
 using std::vector;
@@ -34,6 +35,22 @@ protected:
   virtual void SetUp() { generator_.reset(new SimpleGraphGenerator()); }
 
   std::unique_ptr<SimpleGraphGenerator> generator_;
+};
+
+class DummyFilter : public GraphFilter {
+ public:
+  DummyFilter(bool should_pass) { should_pass_ = should_pass; }
+  bool IsNewGraphAcceptable(const int cur_vertex, const Graph &g) const {
+    return should_pass_;
+  }
+
+  bool IsNewGraphAcceptable(const int cur_vertex,
+                            const std::vector<int> &new_adj_vertices,
+                            const Graph &g) const {
+    return should_pass_;
+  }
+ private:
+  bool should_pass_;
 };
 
 TEST_F(SimpleGraphGeneratorTest, DegreeSequence) {
@@ -171,14 +188,24 @@ TEST_F(SimpleGraphGeneratorTest, GenerateAllGraphsByDegreeSeq) {
 }
 
 TEST_F(SimpleGraphGeneratorTest, GenerateAllUniqueGraphsByDegreeSeq) {
-  vector<int> seq({ 2, 2, 1, 1 });
-  vector<Graph *> v;
-  SimpleGraphGenerator::GenerateAllUniqueGraphs(seq, &v);
-  ASSERT_EQ(1, v.size());
-  vector<string> expected({"0101", "1010", "0100", "1000"});
-  vector<string> result;
-  v[0]->GetAdjMatrix(&result);
-  ExpectVectorsEq<string>(expected, result);
+  {
+    vector<int> seq({ 2, 2, 1, 1 });
+    vector<Graph *> v;
+    DummyFilter filter(true);  // All graphs are allowed to pass.
+    SimpleGraphGenerator::GenerateAllUniqueGraphs(seq, &filter, &v);
+    ASSERT_EQ(1, v.size());
+    vector<string> expected({"0101", "1010", "0100", "1000"});
+    vector<string> result;
+    v[0]->GetAdjMatrix(&result);
+    ExpectVectorsEq<string>(expected, result);
+  }
+  {
+    vector<int> seq({ 2, 2, 1, 1 });
+    vector<Graph *> v;
+    DummyFilter filter(false);  // No graph is allowed to pass.
+    SimpleGraphGenerator::GenerateAllUniqueGraphs(seq, &filter, &v);
+    ASSERT_EQ(0, v.size());
+  }
 }
 
 TEST_F(SimpleGraphGeneratorTest, GenerateAllDegreeSeqs) {

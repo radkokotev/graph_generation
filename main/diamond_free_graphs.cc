@@ -24,8 +24,8 @@ using nauty_utils::IsomorphismChecker;
 
 namespace {
 
-const int kNumberOfVertices = 10;
-const char kExportFileName[] = "diamond_free_10.txt";
+const int kNumberOfVertices = 9;
+const char kExportFileName[] = "diamond_free_9.txt";
 
 
 int64_t final_count = 0;
@@ -50,18 +50,14 @@ void ExportGraphsToFile(const string &filename,
 
 void ExportAllNonIsomorphicGraphsForSequence(const vector<int> &seq) {
   vector<Graph *> all_graphs;
-  SimpleGraphGenerator::GenerateAllUniqueGraphs(seq, &all_graphs);
-  all_graphs_count += all_graphs.size();
-
+  DiamondFreeGraph filter;
+  SimpleGraphGenerator::GenerateAllUniqueGraphs(seq, &filter, &all_graphs);
   bool should_export = false;
-  for (int i = 0; i < all_graphs.size(); ++i) {
-    if (all_graphs[i]->IsConnected() &&
-        DiamondFreeGraph::IsDiamondFree(*(all_graphs[i]))) {
-      // ++all_connected_diamond_free_count;
-      ++final_count;
-      should_export = true;
-    }
+  if (!all_graphs.empty()) {
+    final_count += all_graphs.size();
+    should_export = true;
   }
+
   if (should_export) {
     ExportGraphsToFile(kExportFileName, all_graphs);
   }

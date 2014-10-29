@@ -90,16 +90,19 @@ graph_test.exe : graph.o graph_test.o gtest_main.a
 
 graph_generator.o : $(GRAPH_UTILS_DIR)/graph_generator.cc \
                     $(GRAPH_UTILS_DIR)/graph_generator.h \
-                    $(NAUTY_UTILS_DIR)/nauty_wrapper.h $(GTEST_HEADERS)
+                    $(NAUTY_UTILS_DIR)/nauty_wrapper.h \
+                    $(GRAPH_UTILS_DIR)/graph_utilities.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph_generator.cc
 
 graph_generator_test.o : $(GRAPH_UTILS_DIR)/graph_generator_test.cc \
-                         $(GRAPH_UTILS_DIR)/graph_generator.h $(GTEST_HEADERS)
+                         $(GRAPH_UTILS_DIR)/graph_generator.h \
+                         $(GRAPH_UTILS_DIR)/graph_utilities.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph_generator_test.cc
 
 graph_generator_test.exe : graph_generator.o graph_generator_test.o \
                            $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
-                           $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o graph.o nauty_wrapper.o \
+                           $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o \
+                           graph.o graph_utilities.o nauty_wrapper.o \
                            gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 

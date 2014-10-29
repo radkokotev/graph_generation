@@ -158,25 +158,30 @@ void SimpleGraphGenerator::GenerateAllGraphs(const vector<int> &seq,
   for (int i = 0; i < seq.size(); ++i) {
     new_seq.push_back(make_pair(seq[i], i));
   }
-  GenerateAllGraphs(new_seq, false, &g, graphs);
+  GenerateAllGraphs(new_seq, false, NULL, &g, graphs);
 }
 
 void SimpleGraphGenerator::GenerateAllUniqueGraphs(const vector<int> &seq,
+                                                   GraphFilter *filter,
                                                    vector<Graph *> *graphs) {
   Graph g(seq.size());
   vector<pair<int, int>> new_seq;
   for (int i = 0; i < seq.size(); ++i) {
     new_seq.push_back(make_pair(seq[i], i));
   }
-  GenerateAllGraphs(new_seq, true, &g, graphs);
+  GenerateAllGraphs(new_seq, true, filter, &g, graphs);
 }
 
 void SimpleGraphGenerator::GenerateAllGraphs(
     const vector<pair<int, int>> &seq,  // [ (deg, vertex), (deg, vertex), ...]
     const bool unique_graphs_only,
+    GraphFilter *filter,
     Graph *g,
     vector<Graph *> *graphs) {
   if (seq.front().first <= 0) {
+    if (!g->IsConnected()) {
+      return;  // We are only interested in connected graphs.
+    }
     if (!unique_graphs_only) {
       graphs->push_back(new Graph(*g));
       return;
@@ -203,15 +208,20 @@ void SimpleGraphGenerator::GenerateAllGraphs(
     const set<int> &curr_set = adj_sets[i];
 
     vector<pair<int, int>> new_seq(seq);
+    vector<int> actual_adj_vertices;
     new_seq[0].first = 0;
     for (auto it = curr_set.cbegin(); it != curr_set.cend(); ++it) {
       g->AddEdge(seq[0].second, seq[*it].second);  // Add temporary edges
+      actual_adj_vertices.push_back(seq[*it].second);
       --new_seq[*it].first;  // reduce degree sequence
     }
-
-    std::sort(new_seq.rbegin(), new_seq.rend());  // reverse sort
-    GenerateAllGraphs(new_seq, unique_graphs_only, g, graphs);
-
+    if (!unique_graphs_only ||
+        (unique_graphs_only && filter->IsNewGraphAcceptable(seq[0].second,
+                                                            actual_adj_vertices,
+                                                            *g))) {
+      std::sort(new_seq.rbegin(), new_seq.rend());  // reverse sort
+      GenerateAllGraphs(new_seq, unique_graphs_only, filter, g, graphs);
+    }
     for (auto it = curr_set.cbegin(); it != curr_set.cend(); ++it) {
       g->RemoveEdge(seq[0].second, seq[*it].second);  // remove temp edges
     }
