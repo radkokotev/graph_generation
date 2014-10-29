@@ -24,8 +24,8 @@ using nauty_utils::IsomorphismChecker;
 
 namespace {
 
-const int kNumberOfVertices = 9;
-const char kExportFileName[] = "diamond_free_9.txt";
+const int kNumberOfVertices = 10;
+const char kExportFileName[] = "diamond_free_10.txt";
 
 
 int64_t final_count = 0;
@@ -33,11 +33,9 @@ int64_t all_graphs_count = 0;
 int64_t all_connected_diamond_free_count = 0;
 
 void ExportGraphsToFile(const string &filename,
-                        const IsomorphismChecker &checker) {
+                        const vector<Graph *> &graphs) {
   std::ofstream f;
   f.open (filename, std::ios::app);
-  vector<Graph *> graphs;
-  checker.GetAllNonIsomorphicGraphs(&graphs);
   for (int i = 0; i < graphs.size(); ++i) {
     vector<string> matrix;
     graphs[i]->GetAdjMatrix(&matrix);
@@ -52,23 +50,20 @@ void ExportGraphsToFile(const string &filename,
 
 void ExportAllNonIsomorphicGraphsForSequence(const vector<int> &seq) {
   vector<Graph *> all_graphs;
-  SimpleGraphGenerator::GenerateAllGraphs(seq, &all_graphs);
+  SimpleGraphGenerator::GenerateAllUniqueGraphs(seq, &all_graphs);
   all_graphs_count += all_graphs.size();
 
   bool should_export = false;
-  IsomorphismChecker checker(true);
   for (int i = 0; i < all_graphs.size(); ++i) {
     if (all_graphs[i]->IsConnected() &&
         DiamondFreeGraph::IsDiamondFree(*(all_graphs[i]))) {
-      ++all_connected_diamond_free_count;
-      if (checker.AddGraphToCheck(all_graphs[i])) {
-        ++final_count;
-        should_export = true;
-      }
+      // ++all_connected_diamond_free_count;
+      ++final_count;
+      should_export = true;
     }
   }
   if (should_export) {
-    ExportGraphsToFile(kExportFileName, checker);
+    ExportGraphsToFile(kExportFileName, all_graphs);
   }
 
   while(!all_graphs.empty()) {
@@ -85,7 +80,8 @@ int main() {
   SimpleGraphGenerator::GenerateAllDegreeSequences(kNumberOfVertices, &seqs);
   printf("Total seqs are %d\n", seqs.size());
   for (int i = 0; i < seqs.size(); ++i) {
-    if (i%1000 == 0) printf("Done with %d\n", i);
+    if (i%100 == 0) printf("Done with %d\n", i);
+    if (i > 42000 && i % 10 == 0) printf("Done with %d\n", i);
     ExportAllNonIsomorphicGraphsForSequence(seqs[i]);
   }
 

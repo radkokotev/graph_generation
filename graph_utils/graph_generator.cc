@@ -10,6 +10,7 @@
 #include <utility>
 
 #include "graph.h"
+#include "nauty_utils/nauty_wrapper.h"
 
 using std::vector;
 using std::set;
@@ -157,14 +158,34 @@ void SimpleGraphGenerator::GenerateAllGraphs(const vector<int> &seq,
   for (int i = 0; i < seq.size(); ++i) {
     new_seq.push_back(make_pair(seq[i], i));
   }
-  GenerateAllGraphs(new_seq, &g, graphs);
+  GenerateAllGraphs(new_seq, false, &g, graphs);
+}
+
+void SimpleGraphGenerator::GenerateAllUniqueGraphs(const vector<int> &seq,
+                                                   vector<Graph *> *graphs) {
+  Graph g(seq.size());
+  vector<pair<int, int>> new_seq;
+  for (int i = 0; i < seq.size(); ++i) {
+    new_seq.push_back(make_pair(seq[i], i));
+  }
+  GenerateAllGraphs(new_seq, true, &g, graphs);
 }
 
 void SimpleGraphGenerator::GenerateAllGraphs(
     const vector<pair<int, int>> &seq,  // [ (deg, vertex), (deg, vertex), ...]
+    const bool unique_graphs_only,
     Graph *g,
     vector<Graph *> *graphs) {
   if (seq.front().first <= 0) {
+    if (!unique_graphs_only) {
+      graphs->push_back(new Graph(*g));
+      return;
+    }
+    for (int i = 0; i < graphs->size(); ++i) {
+      if (nauty_utils::IsomorphismChecker::AreIsomorphic(*(*graphs)[i], *g)) {
+        return;  // The generated graph is not unique.
+      }
+    }
     graphs->push_back(new Graph(*g));
     return;
   }
@@ -189,7 +210,7 @@ void SimpleGraphGenerator::GenerateAllGraphs(
     }
 
     std::sort(new_seq.rbegin(), new_seq.rend());  // reverse sort
-    GenerateAllGraphs(new_seq, g, graphs);
+    GenerateAllGraphs(new_seq, unique_graphs_only, g, graphs);
 
     for (auto it = curr_set.cbegin(); it != curr_set.cend(); ++it) {
       g->RemoveEdge(seq[0].second, seq[*it].second);  // remove temp edges

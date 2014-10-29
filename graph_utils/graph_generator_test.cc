@@ -170,6 +170,17 @@ TEST_F(SimpleGraphGeneratorTest, GenerateAllGraphsByDegreeSeq) {
   ExpectVectorsEq<string>(expected2, result2);
 }
 
+TEST_F(SimpleGraphGeneratorTest, GenerateAllUniqueGraphsByDegreeSeq) {
+  vector<int> seq({ 2, 2, 1, 1 });
+  vector<Graph *> v;
+  SimpleGraphGenerator::GenerateAllUniqueGraphs(seq, &v);
+  ASSERT_EQ(1, v.size());
+  vector<string> expected({"0101", "1010", "0100", "1000"});
+  vector<string> result;
+  v[0]->GetAdjMatrix(&result);
+  ExpectVectorsEq<string>(expected, result);
+}
+
 TEST_F(SimpleGraphGeneratorTest, GenerateAllDegreeSeqs) {
   {
     vector<vector<int>> seqs;
