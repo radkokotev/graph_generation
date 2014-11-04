@@ -97,12 +97,12 @@ TEST(GraphTest, Connected) {
     EXPECT_TRUE(g.IsConnected());
   }
   {
-    vector<string> v({"0101", "1010", "0100", "1000"});
+    vector<string> v({ "0101", "1010", "0100", "1000" });
     Graph g(v);
     EXPECT_TRUE(g.IsConnected());
   }
   {
-    vector<string> v({"0110", "1001", "1000", "0100"});
+    vector<string> v({ "0110", "1001", "1000", "0100" });
     Graph g(v);
     EXPECT_TRUE(g.IsConnected());
   }

@@ -13,18 +13,18 @@ namespace graph_utils {
 
 class Graph {
 public:
-  Graph(int n);
-  Graph(const Graph& g);
-  Graph(const vector<string> &adj_matrix);
-  virtual ~Graph() {} 
+  explicit Graph(const int n);
+  explicit Graph(const Graph &g);
+  explicit Graph(const vector<string> &adj_matrix);
+  virtual ~Graph() {}
 
-  virtual void AddEdge(int v1, int v2);
-  virtual void RemoveEdge(int v1, int v2);
-  virtual bool HasEdge(int v1, int v2) const;
+  virtual void AddEdge(const int v1, const int v2);
+  virtual void RemoveEdge(const int v1, const int v2);
+  virtual bool HasEdge(const int v1, const int v2) const;
   virtual void GetAdjMatrix(vector<string> *v) const;
   virtual int size() const;
   virtual bool IsConnected() const;
-  Graph& operator=(const Graph &g);
+  Graph &operator=(const Graph &g);
 
 private:
   int size_;
