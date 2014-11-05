@@ -35,7 +35,7 @@ CXXFLAGS += -std=c++0x -g -Wall -Wextra -pthread -O3
 TESTS = graph_test.exe graph_generator_test.exe graph_utilities_test.exe \
         nauty_wrapper_test.exe
 
-MAINS = diamond_free_graphs.exe
+MAINS = diamond_free_graphs.exe can_test.exe
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -156,4 +156,12 @@ diamond_free_graphs.o : $(MAIN_DIR)/diamond_free_graphs.cc
 diamond_free_graphs.exe : diamond_free_graphs.o graph_utilities.o graph_generator.o graph.o nauty_wrapper.o \
                           $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
                           $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+canonical_graph_generator.o : $(GRAPH_UTILS_DIR)/canonical_graph_generator.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/canonical_graph_generator.cc
+
+can_test.exe : canonical_graph_generator.o graph.o nauty_wrapper.o \
+               $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
+               $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

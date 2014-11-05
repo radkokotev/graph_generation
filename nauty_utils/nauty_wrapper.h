@@ -17,6 +17,7 @@ public:
   bool AddGraphToCheck(Graph *g);
   void GetAllNonIsomorphicGraphs(vector<Graph *> *v) const;
   static bool AreIsomorphic(const Graph &g1, const Graph &g2);
+  static void GetCanonicalLabeling(const Graph &g, vector<int> *labels);
 
 private:
   bool keep_isomorphs_;
