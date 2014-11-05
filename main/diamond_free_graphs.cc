@@ -27,15 +27,13 @@ namespace {
 const int kNumberOfVertices = 9;
 const char kExportFileName[] = "diamond_free_9.txt";
 
-
 int64_t final_count = 0;
 int64_t all_graphs_count = 0;
 int64_t all_connected_diamond_free_count = 0;
 
-void ExportGraphsToFile(const string &filename,
-                        const vector<Graph *> &graphs) {
+void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
   std::ofstream f;
-  f.open (filename, std::ios::app);
+  f.open(filename, std::ios::app);
   for (int i = 0; i < graphs.size(); ++i) {
     vector<string> matrix;
     graphs[i]->GetAdjMatrix(&matrix);
@@ -62,7 +60,7 @@ void ExportAllNonIsomorphicGraphsForSequence(const vector<int> &seq) {
     ExportGraphsToFile(kExportFileName, all_graphs);
   }
 
-  while(!all_graphs.empty()) {
+  while (!all_graphs.empty()) {
     delete all_graphs.back();
     all_graphs.pop_back();
   }
@@ -71,13 +69,15 @@ void ExportAllNonIsomorphicGraphsForSequence(const vector<int> &seq) {
 } // namespace
 
 int main() {
-  vector<vector<int>> seqs;
+  vector<vector<int> > seqs;
   std::clock_t start = std::clock();
   SimpleGraphGenerator::GenerateAllDegreeSequences(kNumberOfVertices, &seqs);
   printf("Total seqs are %d\n", seqs.size());
   for (int i = 0; i < seqs.size(); ++i) {
-    if (i%100 == 0) printf("Done with %d\n", i);
-    if (i > 42000 && i % 10 == 0) printf("Done with %d\n", i);
+    if (i % 100 == 0)
+      printf("Done with %d\n", i);
+    if (i > 42000 && i % 10 == 0)
+      printf("Done with %d\n", i);
     ExportAllNonIsomorphicGraphsForSequence(seqs[i]);
   }
 

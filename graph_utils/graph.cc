@@ -7,14 +7,15 @@
 
 namespace graph_utils {
 
-Graph::Graph(int n) {
+Graph::Graph(const int n) {
   size_ = n;
-  adj_matrix_.resize(n * n, false); 
+  adj_matrix_.resize(n * n, false);
 }
 
-Graph::Graph(const Graph& g) {
+Graph::Graph(const Graph &g) {
   size_ = g.size();
-  adj_matrix_.insert(adj_matrix_.begin(), g.adj_matrix_.begin(), g.adj_matrix_.end());
+  adj_matrix_.insert(adj_matrix_.begin(), g.adj_matrix_.begin(),
+                     g.adj_matrix_.end());
 }
 
 Graph::Graph(const vector<string> &adj_matrix) {
@@ -29,16 +30,16 @@ Graph::Graph(const vector<string> &adj_matrix) {
   }
 }
 
-bool Graph::HasEdge(int v1, int v2) const {
+bool Graph::HasEdge(const int v1, const int v2) const {
   return adj_matrix_[v1 * size_ + v2];
 }
 
-void Graph::AddEdge(int v1, int v2) {
+void Graph::AddEdge(const int v1, const int v2) {
   adj_matrix_[v1 * size_ + v2] = true;
   adj_matrix_[v2 * size_ + v1] = true;
 }
 
-void Graph::RemoveEdge(int v1, int v2) {
+void Graph::RemoveEdge(const int v1, const int v2) {
   adj_matrix_[v1 * size_ + v2] = false;
   adj_matrix_[v2 * size_ + v1] = false;
 }
@@ -60,7 +61,6 @@ bool Graph::IsConnected() const {
   std::set<int> visited_nodes;
   std::queue<int> q;
   q.push(0);
-  visited_nodes.insert(0);
   while (!q.empty()) {
     int cur_edge = q.front();
     q.pop();
@@ -76,9 +76,10 @@ bool Graph::IsConnected() const {
   return visited_nodes.size() == size();
 }
 
-Graph& Graph::operator=(const Graph &g) {
+Graph &Graph::operator=(const Graph &g) {
   size_ = g.size();
-  adj_matrix_.insert(adj_matrix_.begin(), g.adj_matrix_.begin(), g.adj_matrix_.end());
+  adj_matrix_.insert(adj_matrix_.begin(), g.adj_matrix_.begin(),
+                     g.adj_matrix_.end());
   return *this;
 }
 

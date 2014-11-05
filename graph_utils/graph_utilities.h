@@ -8,7 +8,7 @@
 namespace graph_utils {
 
 class GraphFilter {
- public:
+public:
   // This method assumes the graphs 'g' was just changed by adding edges
   // incident on 'cur_vertex'. This may help implementations reduce the number
   // of checks needed for a graph to satisfy this property.

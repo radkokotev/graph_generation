@@ -25,7 +25,7 @@ public:
   // vertex. 'seq_allowed' is a degree sequence in non-increasing order and
   // every boolean value represents if the vertex is allowed or restricted.
   static bool CGTest(const int vertex,
-                     const std::vector<std::pair<int, bool>> &seq_allowed);
+                     const std::vector<std::pair<int, bool> > &seq_allowed);
 
   // Reduces the degree sequence by removing 'vertex' from the graph and all
   // edges that are incident on that vertex.
@@ -38,28 +38,40 @@ public:
   // The resulting adjacency sets are appended to 'adj_sets'.
   static void GenerateAllAdjSets(const std::vector<int> &original_seq,
                                  std::set<int> *cur_set,
-                                 std::vector<std::set<int>> *adj_sets);
+                                 std::vector<std::set<int> > *adj_sets);
 
+  // Generates all graphs with the given degree sequence. No isomorphic
+  // elimination is applied, generated graphs are not guaranteed to be
+  // connected.
   static void GenerateAllGraphs(const std::vector<int> &seq,
                                 std::vector<Graph *> *graphs);
 
+  // Generates all unique connected graphs with the given degree sequence.
   static void GenerateAllUniqueGraphs(const std::vector<int> &seq,
                                       GraphFilter *filter,
                                       std::vector<Graph *> *graphs);
 
+  // Generates all non-increasing degree sequences for n vertices. The generated
+  // sequences are not guaranteed to be graphical. Graphicality needs to be
+  // verified separately.
   static void GenerateAllDegreeSequences(const int n,
-                                         std::vector<std::vector<int>> *seqs);
+                                         std::vector<std::vector<int> > *seqs);
 
 private:
-  static void GenerateAllGraphs(const std::vector<std::pair<int, int>> &seq,
+  // A helper function to construct all graphs for the given degree sequence
+  // following the algoruithm described in the article above. If
+  // 'unique_graphs_only' is false all graphs are generated without pruning.
+  // If it is set to true, the filter is used to prune the search, only
+  // connected graphs are added and isomorphic copies are eliminated.
+  static void GenerateAllGraphs(const std::vector<std::pair<int, int> > &seq,
                                 const bool unique_graphs_only,
-                                GraphFilter *filter,
-                                Graph *g,
+                                GraphFilter *filter, Graph *g,
                                 std::vector<Graph *> *graphs);
 
-  static void GenerateAllDegreeSequences(const int n,
-                                         std::vector<int> *cur_seq,
-                                         std::vector<std::vector<int>> *seqs);
+  // A helper function to recursively generate all non-increasing degree
+  // sequences of order n.
+  static void GenerateAllDegreeSequences(const int n, std::vector<int> *cur_seq,
+                                         std::vector<std::vector<int> > *seqs);
 };
 
 } // namespace graph_utils

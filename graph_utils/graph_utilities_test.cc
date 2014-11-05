@@ -58,7 +58,7 @@ TEST(GraphUtilitiesTest, DiamondFreeGraphFilterTest) {
   {
     vector<string> v({ "0111", "1001", "1001", "1110" });
     Graph g(v);
-    vector<int> new_adj_vertices = {1};
+    vector<int> new_adj_vertices = { 1 };
     EXPECT_FALSE(filter.IsNewGraphAcceptable(0, new_adj_vertices, g));
     new_adj_vertices.clear();
     // No new vertices added. Assumes it was in a safe state.
@@ -75,7 +75,7 @@ TEST(GraphUtilitiesTest, DiamondFreeGraphFilterTest) {
   {
     vector<string> v({ "0111", "1000", "1000", "1000" });
     Graph g(v);
-    vector<int> new_adj_vertices = {0, 1, 2, 3};
+    vector<int> new_adj_vertices = { 0, 1, 2, 3 };
     EXPECT_TRUE(filter.IsNewGraphAcceptable(0, new_adj_vertices, g));
     EXPECT_TRUE(filter.IsNewGraphAcceptable(1, new_adj_vertices, g));
     EXPECT_TRUE(filter.IsNewGraphAcceptable(2, new_adj_vertices, g));
