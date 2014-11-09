@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <ctime>
 #include <algorithm>
 #include <set>
 #include <string>
@@ -294,9 +295,10 @@ int main() {
   Graph *k2 = new Graph(2);
   k2->AddEdge(0, 1);
   cur->push_back(k2);
-  const int target_n = 9;
+  const int target_n = 13;
 
   for (int n = 3; n < target_n; ++n) {
+    std::clock_t start = std::clock();
     IsomorphismChecker checker(true);
 
     for (int graph_index = 0; graph_index < cur->size(); ++graph_index) {
@@ -328,7 +330,9 @@ int main() {
     for (int i = 0; i < next->size(); ++i) {
       if ((*next)[i]->IsConnected()) ++connected;
     }
-    printf("For n = %d there are in total %d graphs; connected -> %d \n", n, next->size(), connected);
+    printf("For n = %d there are in total %d graphs; connected -> %d", n, next->size(), connected);
+    printf("  Time: %.3f ms\n",
+         (std::clock() - start) / (double)(CLOCKS_PER_SEC) * 1000);
     DeleteVectorOfGraphs(cur);
     delete cur;
     cur = next;
