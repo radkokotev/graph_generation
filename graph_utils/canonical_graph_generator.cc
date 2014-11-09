@@ -294,44 +294,51 @@ int main() {
   Graph *k2 = new Graph(2);
   k2->AddEdge(0, 1);
   cur->push_back(k2);
-  const int target_n = 9;
+  const int target_n = 10;
 
   for (int n = 3; n < target_n; ++n) {
     IsomorphismChecker checker(true);
-
     for (int graph_index = 0; graph_index < cur->size(); ++graph_index) {
       const Graph &g = *(*cur)[graph_index];
       vector<Graph *> upper_obj;
       generator.GenerateUpperObjects(g, &upper_obj);
       for (int i = 0; i < upper_obj.size(); ++i) {
-        vector<Graph *> related_lower_obj;
-        generator.GetAllRelatedLowerObjects(*upper_obj[i], &related_lower_obj);
-        vector<Graph *> originals;
-        for (int lower_index = 0;
-            lower_index < related_lower_obj.size() && originals.empty();
-            ++lower_index) {
-          generator.FindGraphsFromLowerObject(*related_lower_obj[lower_index],
-                                              &originals);
+        Graph *cur_upper_obj = new Graph(*upper_obj[i]);
+        if (!checker.AddGraphToCheck(cur_upper_obj)) {
+          delete cur_upper_obj;
         }
-        DeleteVectorOfGraphs(&related_lower_obj);
-        while (!originals.empty()) {
-          if (!checker.AddGraphToCheck(originals.back())) {
-            delete originals.back();
-          }
-          originals.pop_back();
-        }
+        // vector<Graph *> related_lower_obj;
+        // generator.GetAllRelatedLowerObjects(*upper_obj[i], &related_lower_obj);
+        // vector<Graph *> originals;
+        // for (int lower_index = 0;
+        //     lower_index < related_lower_obj.size() && originals.empty();
+        //     ++lower_index) {
+        //   generator.FindGraphsFromLowerObject(*related_lower_obj[lower_index],
+        //                                       &originals);
+        // }
+        // DeleteVectorOfGraphs(&related_lower_obj);
+        // while (!originals.empty()) {
+        //   if (!checker.AddGraphToCheck(originals.back())) {
+        //     delete originals.back();
+        //   }
+        //   originals.pop_back();
+        // }
       }
       DeleteVectorOfGraphs(&upper_obj);
     }
     checker.GetAllNonIsomorphicGraphs(next);
-    int connected = 0;
-    for (int i = 0; i < next->size(); ++i) {
-      if ((*next)[i]->IsConnected()) ++connected;
-    }
-    printf("For n = %d there are in total %d graphs; connected -> %d \n", n, next->size(), connected);
     DeleteVectorOfGraphs(cur);
     delete cur;
-    cur = next;
+    cur = new vector<Graph *>();
+    int connected = 0;
+    for (int i = 0; i < next->size(); ++i) {
+      if (!(*next)[i]->IsConnected()) continue;
+      ++connected;
+      cur->push_back(new Graph(*(*next)[i]));
+    }
+    printf("For n = %d there are in total %d graphs; connected -> %d \n", n, next->size(), connected);
+    DeleteVectorOfGraphs(next);
+    delete next;
     next = new vector<Graph *>();
   }
 }
