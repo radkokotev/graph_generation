@@ -248,7 +248,7 @@ int main() {
         generator.GetAllRelatedLowerObjects(*upper_obj[i], &related_lower_obj);
         vector<Graph *> originals;
         for (int lower_index = 0;
-            lower_index < related_lower_obj.size();// TODO CHANGED && originals.empty();
+            lower_index < related_lower_obj.size() && originals.empty();
             ++lower_index) {
           generator.FindGraphsFromLowerObject(*related_lower_obj[lower_index],
                                               &originals);
