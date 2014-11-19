@@ -8,12 +8,16 @@ do
         echo -e "\e[31mFAILED graph_test\e[0m"
         exit 1
     }
+    ./graph_utilities_test.exe || {
+        echo -e "\e[31mFAILED graph_utilities_test\e[0m"
+        exit 1
+    }
     ./graph_generator_test.exe || {
         echo -e "\e[31mFAILED graph_generator_test\e[0m"
         exit 1
     }
-    ./graph_utilities_test.exe || {
-        echo -e "\e[31mFAILED graph_utilities_test\e[0m"
+    ./canonical_graph_generator_test.exe || {
+        echo -e "\e[31mFAILED canonical_graph_generator_test\e[0m"
         exit 1
     }
     ./nauty_wrapper_test.exe || {

@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <math.h>
 
-#include <ctime>
 #include <algorithm>
+#include <ctime>
 #include <set>
 #include <string>
 #include <vector>
@@ -209,75 +209,7 @@ void CanonicalGraphGenerator::FindGraphsFromLowerObject(
   }
 }
 
-
-
-
-/*
-
-int main2() {
-  vector<set<int> *> prev_subsets;
-  set<set<int> > all_subsets;
-  set<int> empty;
-  prev_subsets.push_back(&empty);
-  GetAllSubsetOfVertices(8, 1, prev_subsets, &all_subsets);
-  printf("The size of the set is %d\n", all_subsets.size());
-
-  for (std::set<set<int> >::iterator i = all_subsets.begin();
-      i != all_subsets.end();
-      ++i) {
-    printf("[");
-    for (std::set<int>::iterator it = i->begin(); it != i->end(); ++it)
-      printf("%d,", *it);
-    printf("]\n");
-  }
-}*/
-
-
-
 } // namespace graph_utils
-
-int main3() {
-  vector<vector<int> *> all_subsets;
-  GetAllSubsetOfVertices(5, &all_subsets);
-  printf("The size of the set is %d\n", all_subsets.size());
-  vector<string> v;
-  v.push_back("01010");
-  v.push_back("10101");
-  v.push_back("01000");
-  v.push_back("10001");
-  v.push_back("01010");
-  Graph g(v);
-  for (int i = 0; i < all_subsets.size(); ++i) {
-    bool valid = IsSubsetSafe(g, *all_subsets[i]);
-    printf("%s, [", valid ? "YES" : " NO");
-    for (int j = 0; j < all_subsets[i]->size(); ++j)
-      printf("%d,", (*all_subsets[i])[j]);
-    printf("]\n");
-  }
-
-  vector<Graph *> upper_obj;
-  graph_utils::CanonicalGraphGenerator generator(0);
-  generator.GenerateLowerObjects(g, &upper_obj);
-  printf("\nThere are %d lower objects\n", upper_obj.size());
-  for (int i = 0; i < upper_obj.size(); ++i) {
-    vector<string> matrix;
-    upper_obj[i]->GetAdjMatrix(&matrix);
-    for (int j = 0; j < matrix.size(); ++j)
-      printf("%s\n", matrix[j].c_str());
-    printf("\n");
-  }
-
-  vector<Graph *> originals;
-  generator.FindGraphsFromLowerObject(g, &originals);
-  printf("\nThere are %d original objects\n", originals.size());
-  for (int i = 0; i < originals.size(); ++i) {
-    vector<string> matrix;
-    originals[i]->GetAdjMatrix(&matrix);
-    for (int j = 0; j < matrix.size(); ++j)
-      printf("%s\n", matrix[j].c_str());
-    printf("\n");
-  }
-}
 
 void DeleteVectorOfGraphs(vector<Graph *> *v) {
   while (!v->empty()) {
@@ -300,17 +232,23 @@ int main() {
   for (int n = 3; n < target_n; ++n) {
     std::clock_t start = std::clock();
     IsomorphismChecker checker(true);
-
     for (int graph_index = 0; graph_index < cur->size(); ++graph_index) {
       const Graph &g = *(*cur)[graph_index];
       vector<Graph *> upper_obj;
       generator.GenerateUpperObjects(g, &upper_obj);
       for (int i = 0; i < upper_obj.size(); ++i) {
+        /*
+        // Only upper objects experiment.
+        Graph *cur_upper_obj = new Graph(*upper_obj[i]);
+        if (!checker.AddGraphToCheck(cur_upper_obj)) {
+          delete cur_upper_obj;
+        }
+        */
         vector<Graph *> related_lower_obj;
         generator.GetAllRelatedLowerObjects(*upper_obj[i], &related_lower_obj);
         vector<Graph *> originals;
         for (int lower_index = 0;
-            lower_index < related_lower_obj.size() && originals.empty();
+            lower_index < related_lower_obj.size();// TODO CHANGED && originals.empty();
             ++lower_index) {
           generator.FindGraphsFromLowerObject(*related_lower_obj[lower_index],
                                               &originals);
@@ -326,101 +264,20 @@ int main() {
       DeleteVectorOfGraphs(&upper_obj);
     }
     checker.GetAllNonIsomorphicGraphs(next);
-    int connected = 0;
-    for (int i = 0; i < next->size(); ++i) {
-      if ((*next)[i]->IsConnected()) ++connected;
-    }
-    printf("For n = %d there are in total %d graphs; connected -> %d", n, next->size(), connected);
-    printf("  Time: %.3f ms\n",
-         (std::clock() - start) / (double)(CLOCKS_PER_SEC) * 1000);
     DeleteVectorOfGraphs(cur);
     delete cur;
+
+    int connected = 0;
+    for (int i = 0; i < next->size(); ++i) {
+      if ((*next)[i]->IsConnected()) {
+        ++connected;
+      }
+    }
     cur = next;
+    printf("For n = %d there are in total %d graphs; connected -> %d",
+           n, next->size(), connected);
+    printf("  Time: %.3f ms\n",
+         (std::clock() - start) / (double)(CLOCKS_PER_SEC) * 1000);
     next = new vector<Graph *>();
   }
-}
-
-int main4() {
-  IsomorphismChecker checker(true);
-  vector<Graph *> next;
-  {
-    Graph g(3);
-    g.AddEdge(0, 1);
-    g.AddEdge(1, 2);
-    graph_utils::CanonicalGraphGenerator generator(0);
-
-    vector<Graph *> upper_obj;
-    generator.GenerateUpperObjects(g, &upper_obj);
-    for (int i = 0; i < upper_obj.size(); ++i) {
-      vector<string> matrix;
-      upper_obj[i]->GetAdjMatrix(&matrix);
-      printf("Upper\n");
-      for (int j = 0; j < matrix.size(); ++j)
-        printf("%s\n", matrix[j].c_str());
-      printf("\n");
-
-      vector<Graph *> related_lower_obj;
-      generator.GetAllRelatedLowerObjects(*upper_obj[i], &related_lower_obj);
-      vector<Graph *> originals;
-      for (int lower_index = 0;
-          lower_index < related_lower_obj.size() && originals.empty();
-          ++lower_index) {
-        generator.FindGraphsFromLowerObject(*related_lower_obj[lower_index],
-                                            &originals);
-      }
-      while (!originals.empty()) {
-        if (!checker.AddGraphToCheck(originals.back())) {
-          delete originals.back();
-        }
-        originals.pop_back();
-      }
-    }
-  }
-  {
-    Graph g(3);
-    g.AddEdge(0, 1);
-    g.AddEdge(0, 2);
-    g.AddEdge(1, 2);
-    graph_utils::CanonicalGraphGenerator generator(0);
-
-    vector<Graph *> upper_obj;
-    generator.GenerateUpperObjects(g, &upper_obj);
-    for (int i = 0; i < upper_obj.size(); ++i) {
-      vector<string> matrix;
-      upper_obj[i]->GetAdjMatrix(&matrix);
-      printf("Upper\n");
-      for (int j = 0; j < matrix.size(); ++j)
-        printf("%s\n", matrix[j].c_str());
-      printf("\n");
-
-      vector<Graph *> related_lower_obj;
-      generator.GetAllRelatedLowerObjects(*upper_obj[i], &related_lower_obj);
-      vector<Graph *> originals;
-      for (int lower_index = 0;
-          lower_index < related_lower_obj.size() && originals.empty();
-          ++lower_index) {
-        generator.FindGraphsFromLowerObject(*related_lower_obj[lower_index],
-                                            &originals);
-      }
-      while (!originals.empty()) {
-        if (!checker.AddGraphToCheck(originals.back())) {
-          delete originals.back();
-        }
-        originals.pop_back();
-      }
-    }
-  }
-  checker.GetAllNonIsomorphicGraphs(&next);
-  printf("There are %d graphs constructed\n", next.size());
-  int connected = 0;
-  for (int i = 0; i < next.size(); ++i) {
-    if (!next[i]->IsConnected()) continue;
-    ++connected;
-    vector<string> matrix;
-    next[i]->GetAdjMatrix(&matrix);
-    for (int j = 0; j < matrix.size(); ++j)
-      printf("%s\n", matrix[j].c_str());
-    printf("\n");
-  }
-  printf("Only %d graphs are connected\n", connected);
 }
