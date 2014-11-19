@@ -6,22 +6,35 @@
 
 namespace nauty_utils {
 
-IsomorphismChecker::IsomorphismChecker(bool keep_isomorphs) {
-  keep_isomorphs_ = keep_isomorphs;
+IsomorphismChecker::IsomorphismChecker(bool optimize) {
+  optimize_ = optimize;
 }
 
 bool IsomorphismChecker::AddGraphToCheck(Graph *g) {
-  for (uint i = 0; i < graphs_.size(); ++i) {
-    if (AreIsomorphic(*(graphs_[i]), *g)) {
+  vector<Graph *> *graphs;
+  if (optimize_) {
+    graphs = &(degree_to_graphs_[g->GetNumberOfEdges()]);
+  } else {
+    graphs = &graphs_;
+  }
+  for (int i = 0; i < graphs->size(); ++i) {
+    if (AreIsomorphic(*(*graphs)[i], *g)) {
       return false;
     }
   }
-  graphs_.push_back(g);
+  graphs->push_back(g);
   return true;
 }
 
 void IsomorphismChecker::GetAllNonIsomorphicGraphs(vector<Graph *> *v) const {
-  v->insert(v->begin(), graphs_.begin(), graphs_.end());
+  if (!optimize_) {
+    v->insert(v->begin(), graphs_.begin(), graphs_.end());
+    return;
+  }
+  for (auto it = degree_to_graphs_.begin();
+      it != degree_to_graphs_.end(); ++it) {
+    v->insert(v->end(), it->second.begin(), it->second.end());
+  }
 }
 
 bool IsomorphismChecker::AreIsomorphic(const Graph &graph_a,

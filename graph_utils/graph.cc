@@ -76,6 +76,18 @@ bool Graph::IsConnected() const {
   return visited_nodes.size() == size();
 }
 
+
+int Graph::GetNumberOfEdges() const {
+  int count = 0;
+  for (int i = 0; i < adj_matrix_.size(); ++i) {
+    if (adj_matrix_[i]) {
+      ++count;
+    }
+  }
+  count /= 2;  // Assuming the graph is simple and there are not self edges.
+  return count;
+}
+
 Graph &Graph::operator=(const Graph &g) {
   size_ = g.size();
   adj_matrix_.insert(adj_matrix_.begin(), g.adj_matrix_.begin(),
