@@ -13,7 +13,7 @@ IsomorphismChecker::IsomorphismChecker(bool optimize) {
 bool IsomorphismChecker::AddGraphToCheck(Graph *g) {
   vector<Graph *> *graphs;
   if (optimize_) {
-    graphs = &(degree_to_graphs_[g->GetNumberOfEdges()]);
+    graphs = &(degree_to_graphs_[g->GetDegSeqString()]);
   } else {
     graphs = &graphs_;
   }
