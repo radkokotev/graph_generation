@@ -24,6 +24,7 @@ public:
   virtual void GetAdjMatrix(vector<string> *v) const;
   virtual int size() const;
   virtual bool IsConnected() const;
+  virtual int GetNumberOfEdges() const;
   Graph &operator=(const Graph &g);
 
 private:

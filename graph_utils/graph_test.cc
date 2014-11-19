@@ -108,4 +108,27 @@ TEST(GraphTest, Connected) {
   }
 }
 
+TEST(GraphTest, GetNumberOfEdgesTest) {
+  {
+    vector<string> v({ "010", "101", "010" });
+    Graph g(v);
+    EXPECT_EQ(2, g.GetNumberOfEdges());
+  }
+  {
+    vector<string> v({ "0111", "1011", "1101", "1110" });
+    Graph g(v);
+    EXPECT_EQ(6, g.GetNumberOfEdges());
+  }
+  {
+    vector<string> v({ "0101", "1010", "0100", "1000" });
+    Graph g(v);
+    EXPECT_EQ(3, g.GetNumberOfEdges());
+  }
+  {
+    vector<string> v({ "0110", "1001", "1000", "0100" });
+    Graph g(v);
+    EXPECT_EQ(3, g.GetNumberOfEdges());
+  }
+}
+
 } // namespace grap_utils
