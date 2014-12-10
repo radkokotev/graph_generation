@@ -36,7 +36,7 @@ TESTS = graph_test.exe graph_utilities_test.exe \
         graph_generator_test.exe canonical_graph_generator_test.exe \
         nauty_wrapper_test.exe
 
-MAINS = diamond_free_graphs.exe can_test.exe
+MAINS = diamond_free_graphs.exe can_test.exe girth_5_experiment.exe
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -173,6 +173,14 @@ diamond_free_graphs.o : $(MAIN_DIR)/diamond_free_graphs.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(MAIN_DIR)/diamond_free_graphs.cc
 
 diamond_free_graphs.exe : diamond_free_graphs.o graph_utilities.o graph_generator.o graph.o nauty_wrapper.o \
+                          $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
+                          $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+girth_5_experiment.o : $(MAIN_DIR)/girth_5_experiment.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(MAIN_DIR)/girth_5_experiment.cc
+
+girth_5_experiment.exe : girth_5_experiment.o graph_utilities.o graph_generator.o graph.o nauty_wrapper.o \
                           $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
                           $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@

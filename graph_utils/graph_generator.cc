@@ -205,7 +205,25 @@ void SimpleGraphGenerator::GenerateAllGraphs(
   GenerateAllAdjSets(helper_seq, &helper_set, &adj_sets);
   for (int i = 0; i < adj_sets.size(); ++i) {
     const set<int> &curr_set = adj_sets[i];
-
+    /******************* TEMP *********************/
+    static bool printed = false;
+    if (adj_sets.size() > 30000) {
+      printf("currently at %d out of %d\n", i, adj_sets.size());
+      if (i % 100 == 0 && graphs->size() > 0)  {
+          vector<string> mat;
+          graphs->back()->GetAdjMatrix(&mat);
+          for (int i = 0; i < mat.size(); ++i) printf("%s\n", mat[i].c_str());
+          printf("\n");
+      }
+    }
+    if (graphs->size() > 0 && !printed) {
+      printed= true;
+      vector<string> mat;
+      graphs->back()->GetAdjMatrix(&mat);
+      for (int i = 0; i < mat.size(); ++i) printf("%s\n", mat[i].c_str());
+      printf("\n");
+    }
+    /****************** END TEMP ******************/
     vector<pair<int, int> > new_seq(seq);
     vector<int> actual_adj_vertices;
     new_seq[0].first = 0;
