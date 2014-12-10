@@ -1,156 +1,52 @@
-
 #include "canonical_graph_generator.h"
-
-#include <stdio.h>
-#include <math.h>
 
 #include <algorithm>
 #include <ctime>
+#include <math.h>
 #include <set>
+#include <stdio.h>
 #include <string>
 #include <vector>
 
 #include "graph.h"
+#include "graph_utilities.h"
 #include "nauty_utils/nauty_wrapper.h"
 
-
-using std::set;
-using std::vector;
 using graph_utils::Graph;
 using nauty_utils::IsomorphismChecker;
+using std::set;
+using std::vector;
 
-
+namespace graph_utils {
 namespace {
-// TODO(radkokotev) these are temp definitions. Make the implementation generic.
 
-// Generates all subsets of the set of vertices V (i.e. the power set of V).
-// The caller is responsible to delete the vectors in all_subsets.
-void GetAllSubsetOfVertices(const int n,
-                            vector<vector<int> *> *all_subsets) {
-  // We know the size of the power set is 2^n.
-  const long long int upper_bound = static_cast<long long int>(pow(2, n));
-  // We shall discard the empty set from the generated set.
-  for (long long int i = 1; i < upper_bound; ++i) {
-    long long int mask = 0x01;
-    vector<int> *cur_set = new vector<int>;
-    int vertex = 0;
-    for (int mask = 0x01, vertex = 0;
-        mask <= i && vertex < n;
-        ++vertex, mask <<= 1) {
-      if (mask & i) {
-        // if the current bit is 1 add the corresponding vertex to the vector.
-        cur_set->push_back(vertex);
-      }
-    }
-    all_subsets->push_back(cur_set);
-  }
-}
-
-// Generates all subsets of the set of vertices V (i.e. the power set of V).
-// Canonically constructs the subsets. TODO(radkokotev) pruning is possible.
-void GetAllSubsetOfVertices(const int n,
-                            const int cur_set_size,
-                            const vector<set<int> *> &prev_subsets,
-                            set<set<int> > *all_subsets) {
-  if (cur_set_size > n) {
-    return;
-  }
-  vector<set<int> *> cur_sets;
-  for (int i = 0; i < prev_subsets.size(); ++i) {
-    set<int> *prev_set = prev_subsets[i];
-
-    for (int new_vertex = 0; new_vertex < n; ++new_vertex) {
-      if (prev_set->find(new_vertex) != prev_set->end()) {
-        // This vertex is already in the subset. Not interested in adding it.
-        continue;
-      }
-      set<int> *cur_subset = new set<int>(*prev_set);
-      cur_subset->insert(new_vertex);
-      if (all_subsets->find(*cur_subset) != all_subsets->end()) {
-        // The set has already been added.
-        delete cur_subset;
-        continue;
-      }
-      all_subsets->insert(*cur_subset);
-      cur_sets.push_back(cur_subset);
-    }
-  }
-  GetAllSubsetOfVertices(n, cur_set_size + 1, cur_sets, all_subsets);
-  while (!cur_sets.empty()) {
-    delete cur_sets.back();
-    cur_sets.pop_back();
-  }
-}
-
-// Returns true if this is an appropriate subset of vertices that could be used
-// to construct an upper object.
-bool IsSubsetSafe(const Graph &g, const vector<int> &subset) {
-  const int n = g.size();
-  for (int i = 0; i < subset.size(); ++i) {
-    for (int j = i + 1; j < subset.size(); ++j) {
-      for (int k = j + 1; k < subset.size(); ++k) {
-        const int count_edges = (g.HasEdge(subset[i], subset[j]) ? 1 : 0) +
-                                (g.HasEdge(subset[i], subset[k]) ? 1 : 0) +
-                                (g.HasEdge(subset[j], subset[k]) ? 1 : 0);
-        if (count_edges > 1) {
-          return false;
-        }
-      }
-      for (int v = 0; v < n; ++v) {
-        if (v == subset[i] || v == subset[j]) {
-          continue;
-        }
-        if (g.HasEdge(subset[i], subset[j]) &&
-            g.HasEdge(subset[i], v) &&
-            g.HasEdge(subset[j], v)) {
-          // There is a triangle, therefore is unsafe.
-          return false;
-        }
-      }
-    }
-  }
-  return true;
-}
-
-void ReduceGraphByRemovingVertex(const Graph &g, const int v, Graph **result) {
-  const int n = g.size();
-  *result = new Graph(n - 1);
-  for (int v1 = 0; v1 < n; ++v1) {
-    if (v1 == v) {
-      continue;
-    }
-    for (int v2 = v1 + 1; v2 < n; ++v2) {
-      if (v2 == v || !g.HasEdge(v1, v2)) {
-        // Only interested in edges which are not incident on v.
-        continue;
-      }
-      // All vertices below the removed one keep the same "label", the ones
-      // above are shifted down.
-      const int a = v1 < v ? v1 : v1 - 1;
-      const int b = v2 < v ? v2 : v2 - 1;
-      (*result)->AddEdge(a, b);
-    }
+void DeleteVectorOfGraphs(vector<Graph *> *v) {
+  while (!v->empty()) {
+    delete v->back();
+    v->pop_back();
   }
 }
 
 }  // namespace
 
-namespace graph_utils {
 
-CanonicalGraphGenerator::CanonicalGraphGenerator(const int n) {
-  // TODO(radkokotev) provide implementation.
+CanonicalGraphGenerator::CanonicalGraphGenerator(const int n,
+                                                 CanonicalGraphFilter *filter) {
+  filter_ = filter;
+  target_size_ = n;
 }
 
 void CanonicalGraphGenerator::GenerateUpperObjects(
     const Graph &g, vector<Graph *> *upper_obj) {
   const int n = g.size();
   vector<vector<int> *> all_subsets;
-  GetAllSubsetOfVertices(n, &all_subsets);
+  filter_->GetAllSubsetOfVertices(n, &all_subsets);
   for (int i = 0; i < all_subsets.size(); ++i) {
-    if (!IsSubsetSafe(g, *all_subsets[i])) {
+    if (!filter_->IsSubsetSafe(g, *all_subsets[i])) {
       // Only safe sequences can be considered.
       continue;
     }
+    // TODO(radkokotev) Improve implementation here.
     vector<string> matrix;
     g.GetAdjMatrix(&matrix);
     string newline = "";
@@ -176,7 +72,7 @@ void CanonicalGraphGenerator::GenerateLowerObjects(
   for (int i = 0; i < n; ++i) {
     // Reduce the graph g, by removing the vertex i and all edges incident on i.
     Graph *lower;
-    ReduceGraphByRemovingVertex(g, i, &lower);
+    filter_->ReduceGraphByRemovingVertex(g, i, &lower);
     lower_obj->push_back(lower);
   }
 }
@@ -196,7 +92,8 @@ void CanonicalGraphGenerator::FindGraphsFromLowerObject(
     Graph *reduced;
     int vertex_to_remove =
         std::find(can_lab.begin(), can_lab.end(), 0) - can_lab.begin();
-    ReduceGraphByRemovingVertex(*candidates[i], vertex_to_remove, &reduced);
+    filter_->ReduceGraphByRemovingVertex(
+        *candidates[i], vertex_to_remove, &reduced);
     if (IsomorphismChecker::AreIsomorphic(lower_obj, *reduced)) {
       // TODO(radkokotev) Check only for automorphism.
       graphs->push_back(new Graph(*candidates[i]));
@@ -209,49 +106,34 @@ void CanonicalGraphGenerator::FindGraphsFromLowerObject(
   }
 }
 
-} // namespace graph_utils
 
-void DeleteVectorOfGraphs(vector<Graph *> *v) {
-  while (!v->empty()) {
-    delete v->back();
-    v->pop_back();
-  }
-}
-
-int main() {
+void CanonicalGraphGenerator::GenerateGraphs(vector<Graph *> **result,
+                                             bool print_messages) {
   vector<Graph *> *cur = new vector<Graph *>();
-  vector<Graph *> *next = new vector<Graph *>();
-
-  graph_utils::CanonicalGraphGenerator generator(0);
+  vector<Graph *> *next;
 
   Graph *k2 = new Graph(2);
   k2->AddEdge(0, 1);
   cur->push_back(k2);
-  const int target_n = 7;
 
-  for (int n = 3; n < target_n; ++n) {
+  for (int n = 3; n <= target_size_; ++n) {
+    next = new vector<Graph *>();
     std::clock_t start = std::clock();
     IsomorphismChecker checker(true);
+
     for (int graph_index = 0; graph_index < cur->size(); ++graph_index) {
       const Graph &g = *(*cur)[graph_index];
       vector<Graph *> upper_obj;
-      generator.GenerateUpperObjects(g, &upper_obj);
+      GenerateUpperObjects(g, &upper_obj);
       for (int i = 0; i < upper_obj.size(); ++i) {
-        /*
-        // Only upper objects experiment.
-        Graph *cur_upper_obj = new Graph(*upper_obj[i]);
-        if (!checker.AddGraphToCheck(cur_upper_obj)) {
-          delete cur_upper_obj;
-        }
-        */
         vector<Graph *> related_lower_obj;
-        generator.GetAllRelatedLowerObjects(*upper_obj[i], &related_lower_obj);
+        GetAllRelatedLowerObjects(*upper_obj[i], &related_lower_obj);
         vector<Graph *> originals;
         for (int lower_index = 0;
             lower_index < related_lower_obj.size() && originals.empty();
             ++lower_index) {
-          generator.FindGraphsFromLowerObject(*related_lower_obj[lower_index],
-                                              &originals);
+          FindGraphsFromLowerObject(*related_lower_obj[lower_index],
+                                    &originals);
         }
         DeleteVectorOfGraphs(&related_lower_obj);
         while (!originals.empty()) {
@@ -266,18 +148,22 @@ int main() {
     checker.GetAllNonIsomorphicGraphs(next);
     DeleteVectorOfGraphs(cur);
     delete cur;
-
-    int connected = 0;
-    for (int i = 0; i < next->size(); ++i) {
-      if ((*next)[i]->IsConnected()) {
-        ++connected;
-      }
-    }
     cur = next;
-    printf("For n = %d there are in total %d graphs; connected -> %d",
-           n, next->size(), connected);
-    printf("  Time: %.3f ms\n",
-         (std::clock() - start) / (double)(CLOCKS_PER_SEC) * 1000);
-    next = new vector<Graph *>();
+
+    if (print_messages) {
+      int connected = 0;
+      for (int i = 0; i < next->size(); ++i) {
+        if ((*next)[i]->IsConnected()) {
+          ++connected;
+        }
+      }
+      printf("For n = %d there are in total %d graphs; connected -> %d",
+             n, next->size(), connected);
+      printf("  Time: %.3f ms\n",
+           (std::clock() - start) / (double)(CLOCKS_PER_SEC) * 1000);
+    }
   }
+  *result = next;
 }
+
+} // namespace graph_utils

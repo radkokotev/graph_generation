@@ -5,15 +5,16 @@
 #ifndef GRAPH_UTILS_CANONICAL_GRAPH_GENERATOR_H_
 #define GRAPH_UTILS_CANONICAL_GRAPH_GENERATOR_H_
 
+#include <string>
+
 #include "graph.h"
+#include "graph_utilities.h"
 
 namespace graph_utils {
 
 class CanonicalGraphGenerator {
  public:
-  // TODO(radkokotev) pass a generator, to generate all possible sets of
-  // vertices W
-  explicit CanonicalGraphGenerator(const int n);
+  CanonicalGraphGenerator(const int n, CanonicalGraphFilter *filter);
 
   // Generates all upper objects <g, W> for the given graph g.
   void GenerateUpperObjects(const Graph &g, std::vector<Graph *> *upper_obj);
@@ -29,7 +30,13 @@ class CanonicalGraphGenerator {
 
   // For a given lower object finds back the possible original graphs.
   void FindGraphsFromLowerObject(const Graph &lower_obj,
-                                std::vector<Graph *> *graphs);
+                                 std::vector<Graph *> *graphs);
+
+  // Generates all graph by canonical construction.
+  void GenerateGraphs(vector<Graph *> **result, bool print_messages = false);
+ private:
+  int target_size_;
+  CanonicalGraphFilter *filter_;
 };
 
 } // namespace graph_utils

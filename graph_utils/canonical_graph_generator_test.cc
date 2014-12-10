@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "graph.h"
+#include "graph_utilities.h"
 #include "gtest/gtest.h"
 #include "nauty_utils/nauty_wrapper.h"
 
@@ -31,23 +32,46 @@ void ExpectVectorsEq(const vector<T> &v1, const vector<T> &v2) {
   }
 }
 
+int CountConnectedGraphs(const vector<Graph *> &graphs) {
+  int count = 0;
+  for (int i = 0; i < graphs.size(); ++i) {
+    if (graphs[i]->IsConnected()) {
+      ++count;
+    }
+  }
+  return count;
+}
+
+class AllGrapsAcceptable : public CanonicalGraphFilter {
+ public:
+  virtual bool IsSubsetSafe(const Graph &g,
+                            const vector<int> &subset) const {
+    return true;
+  }
+};
+
 }  // namespace
 
+class CanonicalGraphGeneratorTest : public testing::Test {
+protected:
+  virtual void SetUp() { filter_.reset(new DiamondFreeGraph()); }
+  std::unique_ptr<CanonicalGraphFilter> filter_;
+};
 
-TEST(CanonicalGraphGeneratorTest, UpperObjects_EmptyGraphTest) {
+TEST_F(CanonicalGraphGeneratorTest, UpperObjects_EmptyGraphTest) {
   vector<string> v({ "000", "000", "000" });
   Graph g(v);
-  CanonicalGraphGenerator generator(g.size());
+  CanonicalGraphGenerator generator(g.size(), filter_.get());
   vector<Graph *> upper_obj;
   generator.GenerateUpperObjects(g, &upper_obj);
   ASSERT_EQ(7, upper_obj.size());
   ASSERT_EQ(4, upper_obj[0]->size());  // The graphs are of order 4.
 }
 
-TEST(CanonicalGraphGeneratorTest, UpperObjects_TriangleGraphTest) {
+TEST_F(CanonicalGraphGeneratorTest, UpperObjects_TriangleGraphTest) {
   vector<string> v({ "011", "101", "110" });
   Graph g(v);
-  CanonicalGraphGenerator generator(g.size());
+  CanonicalGraphGenerator generator(g.size(), filter_.get());
   vector<Graph *> upper_obj;
   generator.GenerateUpperObjects(g, &upper_obj);
   ASSERT_EQ(3, upper_obj.size());
@@ -72,10 +96,10 @@ TEST(CanonicalGraphGeneratorTest, UpperObjects_TriangleGraphTest) {
   }
 }
 
-TEST(CanonicalGraphGeneratorTest, UpperObjects_LineGraphTest) {
+TEST_F(CanonicalGraphGeneratorTest, UpperObjects_LineGraphTest) {
   vector<string> v({ "010", "101", "010" });
   Graph g(v);
-  CanonicalGraphGenerator generator(g.size());
+  CanonicalGraphGenerator generator(g.size(), filter_.get());
   vector<Graph *> upper_obj;
   generator.GenerateUpperObjects(g, &upper_obj);
   ASSERT_EQ(6, upper_obj.size());
@@ -120,10 +144,10 @@ TEST(CanonicalGraphGeneratorTest, UpperObjects_LineGraphTest) {
   }
 }
 
-TEST(CanonicalGraphGeneratorTest, LowerObjectsTest) {
+TEST_F(CanonicalGraphGeneratorTest, LowerObjectsTest) {
   vector<string> v({ "0100", "1011", "0101", "0110" });
   Graph g(v);
-  CanonicalGraphGenerator generator(g.size());
+  CanonicalGraphGenerator generator(g.size(), filter_.get());
   vector<Graph *> lower_obj;
   generator.GenerateLowerObjects(g, &lower_obj);
   ASSERT_EQ(4, lower_obj.size());
@@ -150,6 +174,36 @@ TEST(CanonicalGraphGeneratorTest, LowerObjectsTest) {
     vector<string> mat;
     lower_obj[3]->GetAdjMatrix(&mat);
     ExpectVectorsEq<string>(expected, mat);
+  }
+}
+
+TEST_F(CanonicalGraphGeneratorTest, CompleteGeneration) {
+  // Data as reported by McKay B.
+  filter_.reset(new AllGrapsAcceptable());
+  vector<Graph *> *result = nullptr;
+  {
+    CanonicalGraphGenerator generator(3, filter_.get());
+    generator.GenerateGraphs(&result);
+    ASSERT_EQ(2, CountConnectedGraphs(*result));
+    delete result;
+  }
+  {
+    CanonicalGraphGenerator generator(4, filter_.get());
+    generator.GenerateGraphs(&result);
+    ASSERT_EQ(6, CountConnectedGraphs(*result));
+    delete result;
+  }
+  {
+    CanonicalGraphGenerator generator(5, filter_.get());
+    generator.GenerateGraphs(&result);
+    ASSERT_EQ(21, CountConnectedGraphs(*result));
+    delete result;
+  }
+  {
+    CanonicalGraphGenerator generator(6, filter_.get());
+    generator.GenerateGraphs(&result);
+    ASSERT_EQ(112, CountConnectedGraphs(*result));
+    delete result;
   }
 }
 

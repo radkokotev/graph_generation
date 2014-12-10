@@ -36,7 +36,7 @@ TESTS = graph_test.exe graph_utilities_test.exe \
         graph_generator_test.exe canonical_graph_generator_test.exe \
         nauty_wrapper_test.exe
 
-MAINS = diamond_free_graphs.exe can_test.exe
+MAINS = diamond_free_graphs.exe canonical_diamond_free_graphs.exe
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -132,7 +132,7 @@ canonical_graph_generator_test.o : $(GRAPH_UTILS_DIR)/canonical_graph_generator_
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/canonical_graph_generator_test.cc
 
 canonical_graph_generator_test.exe : canonical_graph_generator_test.o canonical_graph_generator.o \
-                                     graph.o nauty_wrapper.o $(NAUTY_DIR)/nauty.o \
+                                     graph.o graph_utilities.o nauty_wrapper.o $(NAUTY_DIR)/nauty.o \
                                      $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
                                      $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o \
                                      gtest_main.a
@@ -177,8 +177,10 @@ diamond_free_graphs.exe : diamond_free_graphs.o graph_utilities.o graph_generato
                           $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-# experiment
-can_test.exe : canonical_graph_generator.o graph.o nauty_wrapper.o \
-               $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
-               $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
+canonical_diamond_free_graphs.o : $(MAIN_DIR)/canonical_diamond_free_graphs.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(MAIN_DIR)/canonical_diamond_free_graphs.cc
+
+canonical_diamond_free_graphs.exe : canonical_diamond_free_graphs.o canonical_graph_generator.o graph.o \
+                                    graph_utilities.o nauty_wrapper.o $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o \
+                                    $(NAUTY_DIR)/naugraph.o $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
