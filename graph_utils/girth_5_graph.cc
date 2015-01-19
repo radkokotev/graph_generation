@@ -15,7 +15,24 @@ namespace graph_utils {
 
 bool Girth5Graph::IsSubsetSafe(const Graph &g,
                                const vector<int> &subset) const {
-  return false;
+  for (int i = 0; i < subset.size(); ++i) {
+    int a = subset[i];
+    for (int j = i + 1; j < subset.size(); ++j) {
+      int b = subset[j];
+      if (g.HasEdge(a, b)) {
+        return false;  // triangle;
+      }
+      for (int c = 0; c < g.size(); ++c) {
+        if (a == c || b == c) {
+          continue;
+        }
+        if (g.HasEdge(a, c) && g.HasEdge(b, c)) {
+          return false; // square.
+        }
+      }
+    }
+  }
+  return true;
 }
 
 bool Girth5Graph::IsNewGraphAcceptable(const int cur_vertex,

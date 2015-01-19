@@ -121,4 +121,25 @@ TEST_F(Girth5GraphTest, OptimizedGirth5Filter) {
   }
 }
 
+TEST_F(Girth5GraphTest, CanonicalFilterTest) {
+  vector<string> seq({ "0100", "1010", "0101", "0010" });
+  Graph g(seq);
+  {
+    vector<int> adj = {0};
+    EXPECT_TRUE(filter_->IsSubsetSafe(g, adj));
+  }
+  {
+    vector<int> adj = {0, 3};
+    EXPECT_TRUE(filter_->IsSubsetSafe(g, adj));
+  }
+  {
+    vector<int> adj = {0, 1};
+    EXPECT_FALSE(filter_->IsSubsetSafe(g, adj));
+  }
+  {
+    vector<int> adj = {0, 2};
+    EXPECT_FALSE(filter_->IsSubsetSafe(g, adj));
+  }
+}
+
 } // namespace graph_utils
