@@ -32,10 +32,11 @@ CXXFLAGS += -std=c++0x -g -Wall -Wextra -pthread -O3
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = graph_test.exe graph_generator_test.exe graph_utilities_test.exe \
+TESTS = graph_test.exe graph_utilities_test.exe \
+        graph_generator_test.exe canonical_graph_generator_test.exe \
         nauty_wrapper_test.exe
 
-MAINS = diamond_free_graphs.exe
+MAINS = diamond_free_graphs.exe canonical_diamond_free_graphs.exe
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -88,6 +89,21 @@ graph_test.o : $(GRAPH_UTILS_DIR)/graph_test.cc \
 graph_test.exe : graph.o graph_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
+
+graph_utilities.o : $(GRAPH_UTILS_DIR)/graph_utilities.cc \
+                    $(GRAPH_UTILS_DIR)/graph_utilities.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph_utilities.cc
+
+graph_utilities_test.o : $(GRAPH_UTILS_DIR)/graph_utilities_test.cc \
+                         $(GRAPH_UTILS_DIR)/graph_utilities.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph_utilities_test.cc
+
+graph_utilities_test.exe : graph_utilities.o graph_utilities_test.o graph_generator.o gtest_main.a \
+                           graph.o nauty_wrapper.o $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
+                           $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+
 graph_generator.o : $(GRAPH_UTILS_DIR)/graph_generator.cc \
                     $(GRAPH_UTILS_DIR)/graph_generator.h \
                     $(NAUTY_UTILS_DIR)/nauty_wrapper.h \
@@ -106,17 +122,20 @@ graph_generator_test.exe : graph_generator.o graph_generator_test.o \
                            gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-graph_utilities.o : $(GRAPH_UTILS_DIR)/graph_utilities.cc \
-                    $(GRAPH_UTILS_DIR)/graph_utilities.h $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph_utilities.cc
+canonical_graph_generator.o : $(GRAPH_UTILS_DIR)/canonical_graph_generator.cc \
+                              $(GRAPH_UTILS_DIR)/canonical_graph_generator.h \
+                              $(NAUTY_UTILS_DIR)/nauty_wrapper.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/canonical_graph_generator.cc
 
-graph_utilities_test.o : $(GRAPH_UTILS_DIR)/graph_utilities_test.cc \
-                         $(GRAPH_UTILS_DIR)/graph_utilities.h $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/graph_utilities_test.cc
+canonical_graph_generator_test.o : $(GRAPH_UTILS_DIR)/canonical_graph_generator_test.cc \
+                                   $(GRAPH_UTILS_DIR)/canonical_graph_generator.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/canonical_graph_generator_test.cc
 
-graph_utilities_test.exe : graph_utilities.o graph_utilities_test.o graph_generator.o gtest_main.a \
-                           graph.o nauty_wrapper.o $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
-                           $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
+canonical_graph_generator_test.exe : canonical_graph_generator_test.o canonical_graph_generator.o \
+                                     graph.o graph_utilities.o nauty_wrapper.o $(NAUTY_DIR)/nauty.o \
+                                     $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
+                                     $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o \
+                                     gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 # core nauty
@@ -156,4 +175,12 @@ diamond_free_graphs.o : $(MAIN_DIR)/diamond_free_graphs.cc
 diamond_free_graphs.exe : diamond_free_graphs.o graph_utilities.o graph_generator.o graph.o nauty_wrapper.o \
                           $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
                           $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+canonical_diamond_free_graphs.o : $(MAIN_DIR)/canonical_diamond_free_graphs.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(MAIN_DIR)/canonical_diamond_free_graphs.cc
+
+canonical_diamond_free_graphs.exe : canonical_diamond_free_graphs.o canonical_graph_generator.o graph.o \
+                                    graph_utilities.o nauty_wrapper.o $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o \
+                                    $(NAUTY_DIR)/naugraph.o $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
