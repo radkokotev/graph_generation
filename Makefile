@@ -32,11 +32,12 @@ CXXFLAGS += -std=c++0x -g -Wall -Wextra -pthread -O3
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = graph_test.exe graph_utilities_test.exe \
+TESTS = graph_test.exe graph_utilities_test.exe girth_5_graph_test.exe \
         graph_generator_test.exe canonical_graph_generator_test.exe \
         nauty_wrapper_test.exe
 
-MAINS = diamond_free_graphs.exe canonical_diamond_free_graphs.exe
+MAINS = diamond_free_graphs.exe canonical_diamond_free_graphs.exe \
+        girth_5_graphs.exe
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -101,6 +102,16 @@ graph_utilities_test.o : $(GRAPH_UTILS_DIR)/graph_utilities_test.cc \
 graph_utilities_test.exe : graph_utilities.o graph_utilities_test.o graph_generator.o gtest_main.a \
                            graph.o nauty_wrapper.o $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
                            $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+girth_5_graph.o : $(GRAPH_UTILS_DIR)/girth_5_graph.cc $(GRAPH_UTILS_DIR)/girth_5_graph.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/girth_5_graph.cc
+
+girth_5_graph_test.o : $(GRAPH_UTILS_DIR)/girth_5_graph_test.cc \
+                       $(GRAPH_UTILS_DIR)/girth_5_graph.h $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(GRAPH_UTILS_DIR)/girth_5_graph_test.cc
+
+girth_5_graph_test.exe : girth_5_graph.o girth_5_graph_test.o graph_utilities.o gtest_main.a graph.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
 
@@ -183,4 +194,12 @@ canonical_diamond_free_graphs.o : $(MAIN_DIR)/canonical_diamond_free_graphs.cc
 canonical_diamond_free_graphs.exe : canonical_diamond_free_graphs.o canonical_graph_generator.o graph.o \
                                     graph_utilities.o nauty_wrapper.o $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o \
                                     $(NAUTY_DIR)/naugraph.o $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+girth_5_graphs.o : $(MAIN_DIR)/girth_5_graphs.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(MAIN_DIR)/girth_5_graphs.cc
+
+girth_5_graphs.exe : girth_5_graphs.o girth_5_graph.o graph_utilities.o graph_generator.o graph.o nauty_wrapper.o \
+                          $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o $(NAUTY_DIR)/naugraph.o \
+                          $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
