@@ -30,11 +30,12 @@ int64_t all_connected_diamond_free_count = 0;
 
 
 bool IsGraphExtremal(const Graph& g) {
-  int extremal_sizes[] = {0, 0, 1, 2, 3, 5, 6, 8, 10, 12, 15, 16, 18, 21, 23,
+  int kExtremalSizes[] = {0, 0, 1, 2, 3, 5, 6, 8, 10, 12, 15, 16, 18, 21, 23,
                           26, 28, 31, 34, 38, 41, 44, 47, 50, 54, 57, 61, 65,
                           68, 72, 76};
-  return extremal_sizes[g.size()] == g.GetNumberOfEdges();
+  return kExtremalSizes[g.size()] == g.GetNumberOfEdges();
 }
+
 void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
   std::ofstream f;
   f.open(filename, std::ios::app);

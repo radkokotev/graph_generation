@@ -15,6 +15,7 @@ using graph_utils::CanonicalGraphGenerator;
 using graph_utils::Girth5Graph;
 
 namespace {
+
 void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
   std::ofstream f;
   f.open(filename, std::ios::app);

@@ -13,6 +13,7 @@ using std::vector;
 
 namespace graph_utils {
 
+//////////////////////// Implementation of girth 5 /////////////////////////////
 bool Girth5Graph::IsSubsetSafe(const Graph &g,
                                const vector<int> &subset) const {
   for (int i = 0; i < subset.size(); ++i) {
@@ -37,33 +38,7 @@ bool Girth5Graph::IsSubsetSafe(const Graph &g,
 
 bool Girth5Graph::IsNewGraphAcceptable(const int cur_vertex,
                                        const Graph &g) const {
-  const int girth = 5;
-  // a pair represents cur_vertex, source_vertex.
-  std::unique_ptr<set<pair<int,int> > > curr_layer(new set<pair<int,int> >());
-  std::unique_ptr<set<pair<int,int> > > next_layer(new set<pair<int,int> >());
-
-  curr_layer->insert(std::make_pair(cur_vertex, cur_vertex));
-  int layers_traversed = 1;
-  while (layers_traversed < girth) {
-    for (auto vertex = curr_layer->begin(); vertex != curr_layer->end();
-        ++vertex) {
-      for (int j = 0; j < g.size(); ++j) {
-        // If this is the same vertex, or we are trying to go back, skip it.
-        if (j == vertex->first || j == vertex->second ||
-            !g.HasEdge(vertex->first, j)) {
-          continue;
-        }
-        if (layers_traversed > 2 && j == cur_vertex) {
-          return false;
-        }
-        next_layer->insert(std::make_pair(j, vertex->first));
-      }
-    }
-    curr_layer->clear();
-    curr_layer.reset(next_layer.release());
-    next_layer.reset(new set<pair<int,int> >());
-    ++layers_traversed;
-  }
+   return GirthNGraph::IsNewGraphAcceptable(cur_vertex, g, 5);
 }
 
 bool Girth5Graph::IsNewGraphAcceptable(const int cur_vertex,
@@ -94,6 +69,78 @@ bool Girth5Graph::IsNewGraphAcceptable(const int cur_vertex,
 }
 
 bool Girth5Graph::IsGirth5Graph(const Graph &g) const {
+  for (int i = 0; i < g.size(); ++i) {
+    if (!IsNewGraphAcceptable(i, g)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+//////////////////////// Implementation of girth N /////////////////////////////
+bool GirthNGraph::IsSubsetSafe(const Graph &g,
+                               const vector<int> &subset) const {
+  const int n = g.size();
+  Graph new_graph(n + 1);
+
+  for (int i = 0; i < n; ++i) {
+    for (int j = i + 1; j < n; ++j) {
+      if (g.HasEdge(i, j)) {
+        new_graph.AddEdge(i, j);
+      }
+    }
+  }
+  for (int i = 0; i < subset.size(); ++i) {
+    new_graph.AddEdge(subset[i], n);
+  }
+  return IsNewGraphAcceptable(n, new_graph);
+}
+
+bool GirthNGraph::IsNewGraphAcceptable(const int cur_vertex,
+                                       const Graph &g) const {
+  IsNewGraphAcceptable(cur_vertex, g, girth_);
+}
+
+bool GirthNGraph::IsNewGraphAcceptable(const int cur_vertex,
+                                       const vector<int> &new_adj_vertices,
+                                       const Graph &g) const {
+  return IsNewGraphAcceptable(cur_vertex, g);
+}
+
+bool GirthNGraph::IsNewGraphAcceptable(const int cur_vertex,
+                                       const Graph &g,
+                                       const int girth) {
+  // a pair represents cur_vertex, source_vertex.
+  std::unique_ptr<set<pair<int,int> > > curr_layer(new set<pair<int,int> >());
+  std::unique_ptr<set<pair<int,int> > > next_layer(new set<pair<int,int> >());
+
+  curr_layer->insert(std::make_pair(cur_vertex, cur_vertex));
+  int layers_traversed = 1;
+  while (layers_traversed < girth) {
+    for (auto vertex = curr_layer->begin(); vertex != curr_layer->end();
+        ++vertex) {
+      for (int j = 0; j < g.size(); ++j) {
+        // If this is the same vertex, or we are trying to go back, skip it.
+        if (j == vertex->first || j == vertex->second ||
+            !g.HasEdge(vertex->first, j)) {
+          continue;
+        }
+        if (layers_traversed > 2 && j == cur_vertex) {
+          return false;
+        }
+        next_layer->insert(std::make_pair(j, vertex->first));
+      }
+    }
+    curr_layer->clear();
+    curr_layer.reset(next_layer.release());
+    next_layer.reset(new set<pair<int,int> >());
+    ++layers_traversed;
+  }
+  return true;
+}
+
+bool GirthNGraph::IsGirthNGraph(const Graph &g) const {
   for (int i = 0; i < g.size(); ++i) {
     if (!IsNewGraphAcceptable(i, g)) {
       return false;
