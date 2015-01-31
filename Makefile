@@ -37,7 +37,7 @@ TESTS = graph_test.exe graph_utilities_test.exe girth_5_graph_test.exe \
         nauty_wrapper_test.exe
 
 MAINS = diamond_free_graphs.exe canonical_diamond_free_graphs.exe \
-        girth_5_graphs.exe canonical_girth_5_graphs.exe
+        girth_5_graphs.exe canonical_girth_5_graphs.exe callgeng_generic_girth.exe
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -211,4 +211,9 @@ canonical_girth_5_graphs.exe : canonical_girth_5_graphs.o girth_5_graph.o canoni
                                     graph_utilities.o nauty_wrapper.o $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o \
                                     $(NAUTY_DIR)/naugraph.o $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+callgeng_generic_girth.exe : $(NAUTY_DIR)/geng.c $(MAIN_DIR)/callgeng_generic_girth.cc girth_5_graph.o graph_utilities.o graph.o \
+                             $(NAUTY_DIR)/gtools.o $(NAUTY_DIR)/nauty1.o $(NAUTY_DIR)/nautil1.o $(NAUTY_DIR)/naugraph1.o \
+                             $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o 
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DMAXN=32 -DOUTPROC=myoutproc -DGENG_MAIN=geng_main -DPRUNE=geng_prune -lpthread $^ -o $@
 

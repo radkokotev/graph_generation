@@ -17,11 +17,12 @@ using std::queue;
 using graph_utils::SimpleGraphGenerator;
 using graph_utils::Graph;
 using graph_utils::Girth5Graph;
+using graph_utils::GirthNGraph;
 using nauty_utils::IsomorphismChecker;
 
 namespace {
 
-const int kNumberOfVertices = 10;
+const int kNumberOfVertices = 6;
 const char kExportFileName[] = "girth_5_order_temp.txt";
 
 int64_t final_count = 0;
@@ -53,7 +54,7 @@ void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
 
 void ExportAllNonIsomorphicGraphsForSequence(const vector<int> &seq) {
   vector<Graph *> all_graphs;
-  Girth5Graph filter;
+  GirthNGraph filter(5);
   SimpleGraphGenerator::GenerateAllUniqueGraphs(seq, &filter, &all_graphs);
   bool should_export = false;
   vector<Graph *> extremal_graphs;

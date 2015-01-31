@@ -77,7 +77,6 @@ bool Girth5Graph::IsGirth5Graph(const Graph &g) const {
   return true;
 }
 
-
 //////////////////////// Implementation of girth N /////////////////////////////
 bool GirthNGraph::IsSubsetSafe(const Graph &g,
                                const vector<int> &subset) const {

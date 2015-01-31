@@ -125,25 +125,31 @@ void CanonicalGraphGenerator::GenerateGraphs(vector<Graph *> **result,
       const Graph &g = *(*cur)[graph_index];
       vector<Graph *> upper_obj;
       GenerateUpperObjects(g, &upper_obj);
-      for (int i = 0; i < upper_obj.size(); ++i) {
-        vector<Graph *> related_lower_obj;
-        GetAllRelatedLowerObjects(*upper_obj[i], &related_lower_obj);
-        vector<Graph *> originals;
-        for (int lower_index = 0;
-            lower_index < related_lower_obj.size() && originals.empty();
-            ++lower_index) {
-          FindGraphsFromLowerObject(*related_lower_obj[lower_index],
-                                    &originals);
+      while (!upper_obj.empty()) {
+        if (!checker.AddGraphToCheck(upper_obj.back())) {
+          delete upper_obj.back();
         }
-        DeleteVectorOfGraphs(&related_lower_obj);
-        while (!originals.empty()) {
-          if (!checker.AddGraphToCheck(originals.back())) {
-            delete originals.back();
-          }
-          originals.pop_back();
-        }
+        upper_obj.pop_back();
       }
-      DeleteVectorOfGraphs(&upper_obj);
+      // for (int i = 0; i < upper_obj.size(); ++i) {
+      //   vector<Graph *> related_lower_obj;
+      //   GetAllRelatedLowerObjects(*upper_obj[i], &related_lower_obj);
+      //   vector<Graph *> originals;
+      //   for (int lower_index = 0;
+      //       lower_index < related_lower_obj.size() && originals.empty();
+      //       ++lower_index) {
+      //     FindGraphsFromLowerObject(*related_lower_obj[lower_index],
+      //                               &originals);
+      //   }
+      //   DeleteVectorOfGraphs(&related_lower_obj);
+      //   while (!originals.empty()) {
+      //     if (!checker.AddGraphToCheck(originals.back())) {
+      //       delete originals.back();
+      //     }
+      //     originals.pop_back();
+      //   }
+      // }
+      // DeleteVectorOfGraphs(&upper_obj);
     }
     checker.GetAllNonIsomorphicGraphs(next);
     DeleteVectorOfGraphs(cur);
