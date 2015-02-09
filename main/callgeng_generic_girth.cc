@@ -20,6 +20,9 @@ using std::pair;
 
 namespace {
 
+const int kGirth = 16;
+graph_utils::GirthNGraph filter(kGirth);
+
 // A helper function for converting from graph in NAUTY format to the graph
 // format used in this project.
 void ConvertNautyGraphToGraph(graph *g, int n, Graph *graph) {
@@ -36,6 +39,8 @@ void ConvertNautyGraphToGraph(graph *g, int n, Graph *graph) {
 }
 
 int GetMinLengthCycle(const Graph &g) {
+  const int kInfinity = 1000000;
+  int min_length_cycle = kInfinity;
   for (int cur_vertex = 0; cur_vertex < g.size(); ++cur_vertex) {
     // a pair represents cur_vertex, source_vertex.
     std::unique_ptr<std::set<pair<int,int> > > curr_layer(new std::set<pair<int,int> >());
@@ -53,7 +58,12 @@ int GetMinLengthCycle(const Graph &g) {
             continue;
           }
           if (layers_traversed > 2 && j == cur_vertex) {
-            return layers_traversed;
+            if (min_length_cycle > layers_traversed) {
+              min_length_cycle = layers_traversed;
+            }
+            if (min_length_cycle == kGirth) {
+              return min_length_cycle;
+            }
           }
           next_layer->insert(std::make_pair(j, vertex->first));
         }
@@ -64,7 +74,7 @@ int GetMinLengthCycle(const Graph &g) {
       ++layers_traversed;
     }
   }
-  return 0;
+  return min_length_cycle == kInfinity ? 0 : min_length_cycle;
 }
 
 int MaxGirth(const std::vector<Graph *> graphs) {
@@ -75,13 +85,6 @@ int MaxGirth(const std::vector<Graph *> graphs) {
     if (max < smallest_cycle) {
       max = smallest_cycle;
     }
-    // for (int girth = max >= 3 ? max + 1 : 3; girth < n; ++girth) {
-    //   graph_utils::GirthNGraph cur_girth_filter(girth);
-    //   if (!cur_girth_filter.IsGirthNGraph(*graphs[i]) && max < girth) {
-    //     max = girth - 1;
-    //     break;
-    //   }
-    // }
   }
   return max;
 }
@@ -97,9 +100,6 @@ void PrintGraphs(const std::vector<Graph *> graphs) {
     matrix.clear();
   }
 }
-
-const int kGirth = 5;
-graph_utils::GirthNGraph filter(kGirth);
 
 }  // namespace
 
