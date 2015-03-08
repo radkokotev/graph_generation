@@ -83,7 +83,6 @@ bool SimpleGraphGenerator::CGTest(const int vertex,
   for (int i = 0;
        i < seq_allowed.size() && leftmost_adj_set.size() < kAdjSetSize; ++i) {
     if (!seq_allowed[i].second || i == vertex) {
-      ;
       continue;
     }
     leftmost_adj_set.push_back(i);
@@ -106,7 +105,12 @@ void SimpleGraphGenerator::GenerateAllAdjSets(const vector<int> &original_seq,
                                               vector<set<int> > *adj_sets) {
   if (cur_set->size() >= original_seq[0]) {
     // This set is complete.
-    adj_sets->push_back(*cur_set);
+    if (adj_sets->empty() ||
+        (!adj_sets->empty() && ColexCmp(*cur_set, adj_sets->front()))) {
+      adj_sets->push_back(*cur_set);
+    } else if(!adj_sets->empty()) {
+      printf("CoLex works!\n");
+    }
     return;
   }
   int vertex = original_seq.size() - 1;
@@ -178,9 +182,11 @@ void SimpleGraphGenerator::GenerateAllGraphs(
     const bool unique_graphs_only, GraphFilter *filter, Graph *g,
     vector<Graph *> *graphs) {
   if (seq.front().first <= 0) {
+    ++count_all_graphs;
     if (!g->IsConnected()) {
       return; // We are only interested in connected graphs.
     }
+    ++count_connected_graphs;
     if (!unique_graphs_only) {
       graphs->push_back(new Graph(*g));
       return;
@@ -219,6 +225,8 @@ void SimpleGraphGenerator::GenerateAllGraphs(
                                    seq[0].second, actual_adj_vertices, *g))) {
       std::sort(new_seq.rbegin(), new_seq.rend()); // reverse sort
       GenerateAllGraphs(new_seq, unique_graphs_only, filter, g, graphs);
+    } else {
+      ++count_prunings;
     }
     for (auto it = curr_set.cbegin(); it != curr_set.cend(); ++it) {
       g->RemoveEdge(seq[0].second, seq[*it].second); // remove temp edges
@@ -251,5 +259,26 @@ void SimpleGraphGenerator::GenerateAllDegreeSequences(
   }
   cur_seq->erase(cur_seq->begin() + cur_seq->size() - 1);
 }
+
+// s1 < s2
+bool SimpleGraphGenerator::ColexCmp(const std::set<int> &s1,
+                                    const std::set<int> &s2) {
+  for (auto it1 = s1.crbegin(), it2 = s2.crbegin();
+       it1 != s1.crend() && it2 != s2.crend();
+       ++it1, ++it2) {
+    if ((*it1) == (*it2)) {
+      continue;
+    }
+    if ((*it1) < (*it2)) {
+      return true;
+    }
+    return false;
+  }
+  return true;
+}
+
+int SimpleGraphGenerator::count_all_graphs = 0;
+int SimpleGraphGenerator::count_connected_graphs = 0;
+int SimpleGraphGenerator::count_prunings = 0;
 
 } // namespace graph_utils

@@ -57,6 +57,10 @@ public:
   static void GenerateAllDegreeSequences(const int n,
                                          std::vector<std::vector<int> > *seqs);
 
+static int count_all_graphs;
+static int count_connected_graphs;
+static int count_prunings;
+
 private:
   // A helper function to construct all graphs for the given degree sequence
   // following the algoruithm described in the article above. If
@@ -72,6 +76,8 @@ private:
   // sequences of order n.
   static void GenerateAllDegreeSequences(const int n, std::vector<int> *cur_seq,
                                          std::vector<std::vector<int> > *seqs);
+
+  static bool ColexCmp(const std::set<int> &s1, const std::set<int> &s2);
 };
 
 } // namespace graph_utils
