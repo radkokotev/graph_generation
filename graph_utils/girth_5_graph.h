@@ -15,12 +15,11 @@ namespace graph_utils {
 // canonical graph generator.
 class Girth5Graph : public CanonicalGraphFilter, public GraphFilter {
 public:
-  Girth5Graph() {};
+  Girth5Graph(){};
   virtual ~Girth5Graph() {}
 
   // Override abstract method from CanonicalGraphFilter.
-  virtual bool IsSubsetSafe(const Graph &g,
-                            const vector<int> &subset) const;
+  virtual bool IsSubsetSafe(const Graph &g, const vector<int> &subset) const;
 
   // Implement the two methods from GraphFilter interface.
   virtual bool IsNewGraphAcceptable(const int cur_vertex, const Graph &g) const;
@@ -41,8 +40,7 @@ public:
   virtual ~GirthNGraph() {}
 
   // Override abstract method from CanonicalGraphFilter.
-  virtual bool IsSubsetSafe(const Graph &g,
-                            const vector<int> &subset) const;
+  virtual bool IsSubsetSafe(const Graph &g, const vector<int> &subset) const;
 
   // Implement the two methods from GraphFilter interface.
   virtual bool IsNewGraphAcceptable(const int cur_vertex, const Graph &g) const;
@@ -51,15 +49,14 @@ public:
                                     const vector<int> &new_adj_vertices,
                                     const Graph &g) const;
 
-  static bool IsNewGraphAcceptable(const int cur_vertex,
-                                   const Graph &g,
+  static bool IsNewGraphAcceptable(const int cur_vertex, const Graph &g,
                                    const int girth);
 
-  // Returns true if a the graph 'g' is of the given girth (i.e. the shortest
-  // cycle of the graph is of length at least 'girth').
+  // Returns true if a the graph 'g' is of girth at least the given one (i.e.
+  // the shortest cycle of the graph is of length at least 'girth').
   bool IsGirthNGraph(const Graph &g) const;
 
- private:
+private:
   int girth_;
 };
 

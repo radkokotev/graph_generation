@@ -28,16 +28,14 @@ const int kNumberOfVertices = 8;
 const char kExportFileName[] = "temp_diamond_free_10.txt";
 
 int64_t final_count = 0;
-int64_t all_graphs_count = 0;
-int64_t all_connected_diamond_free_count = 0;
 
 void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
   std::ofstream f;
   f.open(filename, std::ios::app);
-  for (int i = 0; i < graphs.size(); ++i) {
+  for (size_t i = 0; i < graphs.size(); ++i) {
     vector<string> matrix;
     graphs[i]->GetAdjMatrix(&matrix);
-    for (int j = 0; j < matrix.size(); ++j) {
+    for (size_t j = 0; j < matrix.size(); ++j) {
       f << matrix[j] << std::endl;
     }
     f << std::endl;
@@ -70,28 +68,17 @@ void ExportAllNonIsomorphicGraphsForSequence(const vector<int> &seq) {
 } // namespace
 
 int main() {
-  vector<vector<int> > seqs;
+  vector<vector<int>> seqs;
   std::clock_t start = std::clock();
   SimpleGraphGenerator::GenerateAllDegreeSequences(kNumberOfVertices, &seqs);
-  // printf("Total seqs are %d\n", seqs.size());
-  SimpleGraphGenerator::count_all_graphs = 0;
-  SimpleGraphGenerator::count_connected_graphs = 0;
-  SimpleGraphGenerator::count_prunings = 0;
-  for (int i = 0; i < seqs.size(); ++i) {
-    // if (i % 100 == 0)
-    //   printf("Done with %d\n", i);
-    // if (i > 42000 && i % 10 == 0)
-    //   printf("Done with %d\n", i);
+  printf("Number of degree sequences is %lu\n", seqs.size());
+  for (size_t i = 0; i < seqs.size(); ++i) {
     ExportAllNonIsomorphicGraphsForSequence(seqs[i]);
   }
-
-  printf("Number of vertices is %d\n", kNumberOfVertices);
-  printf("The number of graph generated is %lld\n", SimpleGraphGenerator::count_all_graphs);
-  printf("The number of connected diamond-free graphs is %lld\n",
-         SimpleGraphGenerator::count_connected_graphs);
-  printf("The number of unique connected diamond-free graphs is %lld\n",
-         final_count);
-  printf("Number of prunings: %d\n", SimpleGraphGenerator::count_prunings);
+  printf("The number of unique connected diamond-free graphs "
+         "of order %d is %ld\n",
+         kNumberOfVertices, final_count);
+  printf("Exporting all graphs to file %s\n", kExportFileName);
   printf("Time: %.3f ms\n",
          (std::clock() - start) / (double)(CLOCKS_PER_SEC) * 1000);
   return 0;

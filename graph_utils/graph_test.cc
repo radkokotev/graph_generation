@@ -15,7 +15,7 @@ void ExpectVectorsEq(const vector<string> &v1, const vector<string> &v2) {
 } // namespace
 
 TEST(GraphTest, NoEdges) {
-  vector<string> v({ "000", "000", "000" });
+  vector<string> v({"000", "000", "000"});
   Graph g(v);
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
@@ -25,7 +25,7 @@ TEST(GraphTest, NoEdges) {
 }
 
 TEST(GraphTest, SomeEdges) {
-  vector<string> v({ "1111", "1111", "1111", "1111" });
+  vector<string> v({"1111", "1111", "1111", "1111"});
   Graph g(v);
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
@@ -35,7 +35,7 @@ TEST(GraphTest, SomeEdges) {
 }
 
 TEST(GraphTest, AddEdges) {
-  vector<string> v({ "000", "000", "000" });
+  vector<string> v({"000", "000", "000"});
   Graph g(v);
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
@@ -56,30 +56,30 @@ TEST(GraphTest, AddEdges) {
 }
 
 TEST(GraphTest, GetAdjMatrix) {
-  vector<string> v({ "000", "000", "000" });
+  vector<string> v({"000", "000", "000"});
   Graph g(v);
 
   vector<string> mat1;
-  vector<string> expected1({ "000", "000", "000" });
+  vector<string> expected1({"000", "000", "000"});
   g.GetAdjMatrix(&mat1);
   ExpectVectorsEq(expected1, mat1);
 
   g.AddEdge(0, 1);
   g.AddEdge(2, 2);
   vector<string> mat2;
-  vector<string> expected2({ "010", "100", "001" });
+  vector<string> expected2({"010", "100", "001"});
   g.GetAdjMatrix(&mat2);
   ExpectVectorsEq(expected2, mat2);
 }
 
 TEST(GraphTest, NotConnected) {
   {
-    vector<string> v({ "000", "000", "000" });
+    vector<string> v({"000", "000", "000"});
     Graph g(v);
     EXPECT_FALSE(g.IsConnected());
   }
   {
-    vector<string> v({ "010", "100", "000" });
+    vector<string> v({"010", "100", "000"});
     Graph g(v);
     EXPECT_FALSE(g.IsConnected());
   }
@@ -87,22 +87,22 @@ TEST(GraphTest, NotConnected) {
 
 TEST(GraphTest, Connected) {
   {
-    vector<string> v({ "010", "101", "010" });
+    vector<string> v({"010", "101", "010"});
     Graph g(v);
     EXPECT_TRUE(g.IsConnected());
   }
   {
-    vector<string> v({ "0111", "1011", "1101", "1110" });
+    vector<string> v({"0111", "1011", "1101", "1110"});
     Graph g(v);
     EXPECT_TRUE(g.IsConnected());
   }
   {
-    vector<string> v({ "0101", "1010", "0100", "1000" });
+    vector<string> v({"0101", "1010", "0100", "1000"});
     Graph g(v);
     EXPECT_TRUE(g.IsConnected());
   }
   {
-    vector<string> v({ "0110", "1001", "1000", "0100" });
+    vector<string> v({"0110", "1001", "1000", "0100"});
     Graph g(v);
     EXPECT_TRUE(g.IsConnected());
   }
@@ -110,22 +110,22 @@ TEST(GraphTest, Connected) {
 
 TEST(GraphTest, GetNumberOfEdgesTest) {
   {
-    vector<string> v({ "010", "101", "010" });
+    vector<string> v({"010", "101", "010"});
     Graph g(v);
     EXPECT_EQ(2, g.GetNumberOfEdges());
   }
   {
-    vector<string> v({ "0111", "1011", "1101", "1110" });
+    vector<string> v({"0111", "1011", "1101", "1110"});
     Graph g(v);
     EXPECT_EQ(6, g.GetNumberOfEdges());
   }
   {
-    vector<string> v({ "0101", "1010", "0100", "1000" });
+    vector<string> v({"0101", "1010", "0100", "1000"});
     Graph g(v);
     EXPECT_EQ(3, g.GetNumberOfEdges());
   }
   {
-    vector<string> v({ "0110", "1001", "1000", "0100" });
+    vector<string> v({"0110", "1001", "1000", "0100"});
     Graph g(v);
     EXPECT_EQ(3, g.GetNumberOfEdges());
   }
@@ -133,22 +133,22 @@ TEST(GraphTest, GetNumberOfEdgesTest) {
 
 TEST(GraphTest, GetDegSeqStringTest) {
   {
-    vector<string> v({ "010", "101", "010" });
+    vector<string> v({"010", "101", "010"});
     Graph g(v);
     EXPECT_EQ("112", g.GetDegSeqString());
   }
   {
-    vector<string> v({ "0111", "1011", "1101", "1110" });
+    vector<string> v({"0111", "1011", "1101", "1110"});
     Graph g(v);
     EXPECT_EQ("3333", g.GetDegSeqString());
   }
   {
-    vector<string> v({ "0101", "1010", "0100", "1000" });
+    vector<string> v({"0101", "1010", "0100", "1000"});
     Graph g(v);
     EXPECT_EQ("1122", g.GetDegSeqString());
   }
   {
-    vector<string> v({ "0110", "1001", "1000", "0100" });
+    vector<string> v({"0110", "1001", "1000", "0100"});
     Graph g(v);
     EXPECT_EQ("1122", g.GetDegSeqString());
   }

@@ -1,4 +1,5 @@
-// Implementation of SimpleGraphGenerator
+// Implementation of brute-force graph generator - SimpleGraphGenerator.
+
 #include "graph_generator.h"
 
 #include <algorithm>
@@ -23,7 +24,7 @@ SimpleGraphGenerator::SimpleGraphGenerator() {}
 
 bool SimpleGraphGenerator::IsGraphicalDegreeSeq(const vector<int> &seq) {
   int sum = 0;
-  for (int i = 0; i < seq.size(); ++i) {
+  for (size_t i = 0; i < seq.size(); ++i) {
     sum += seq[i];
     if (i < seq.size() - 1 && seq[i] < seq[i + 1]) {
       throw std::invalid_argument(
@@ -34,19 +35,19 @@ bool SimpleGraphGenerator::IsGraphicalDegreeSeq(const vector<int> &seq) {
     return false;
   }
 
-  for (int k = 1; k <= seq.size(); ++k) {
+  for (int k = 1; k <= (int) seq.size(); ++k) {
     int left_sum = 0;
     int right_sum = k * (k - 1);
     for (int i = 1; i <= k; ++i) {
       left_sum += seq[i - 1]; // 0-based index
     }
-    for (int i = k + 1; i <= seq.size(); ++i) {
+    for (int i = k + 1; i <= (int) seq.size(); ++i) {
       right_sum += std::min(k, seq[i - 1]); // 0-based index
     }
     if (left_sum > right_sum) {
       return false;
     }
-    if (k < seq.size() && seq[k - 1] >= k && seq[k] < k + 1) {
+    if (k < (int) seq.size() && seq[k - 1] >= k && seq[k] < k + 1) {
       break;
     }
   }
@@ -55,15 +56,15 @@ bool SimpleGraphGenerator::IsGraphicalDegreeSeq(const vector<int> &seq) {
 
 void SimpleGraphGenerator::ReduceDegreeSequence(
     const int vertex, const vector<int> &incident_vertices, vector<int> *seq) {
-  if (vertex >= seq->size() || vertex < 0) {
+  if (vertex >= (int) seq->size() || vertex < 0) {
     throw std::invalid_argument("Vertex out of bounds.");
   }
-  if ((*seq)[vertex] != incident_vertices.size()) {
+  if ((*seq)[vertex] != (int) incident_vertices.size()) {
     throw std::invalid_argument("Mismatching number of incident vertices.");
   }
   (*seq)[vertex] = 0;
-  for (int i = 0; i < incident_vertices.size(); ++i) {
-    if (incident_vertices[i] >= seq->size() || incident_vertices[i] < 0) {
+  for (size_t i = 0; i < incident_vertices.size(); ++i) {
+    if (incident_vertices[i] >= (int) seq->size() || incident_vertices[i] < 0) {
       throw std::invalid_argument("Incident vertex out of bounds.");
     }
     (*seq)[incident_vertices[i]]--;
@@ -74,15 +75,15 @@ void SimpleGraphGenerator::ReduceDegreeSequence(
 }
 
 bool SimpleGraphGenerator::CGTest(const int vertex,
-                                  const vector<pair<int, bool> > &seq_allowed) {
-  if (vertex >= seq_allowed.size() || vertex < 0) {
+                                  const vector<pair<int, bool>> &seq_allowed) {
+  if (vertex >= (int) seq_allowed.size() || vertex < 0) {
     throw std::invalid_argument("Vertex out of bounds.");
   }
   vector<int> leftmost_adj_set;
-  const int kAdjSetSize = seq_allowed[vertex].first;
-  for (int i = 0;
+  const size_t kAdjSetSize = (size_t) seq_allowed[vertex].first;
+  for (size_t i = 0;
        i < seq_allowed.size() && leftmost_adj_set.size() < kAdjSetSize; ++i) {
-    if (!seq_allowed[i].second || i == vertex) {
+    if (!seq_allowed[i].second || (int) i == vertex) {
       continue;
     }
     leftmost_adj_set.push_back(i);
@@ -92,7 +93,7 @@ bool SimpleGraphGenerator::CGTest(const int vertex,
     return false;
   }
   vector<int> reduced_seq(seq_allowed.size(), 0);
-  for (int i = 0; i < seq_allowed.size(); ++i) {
+  for (size_t i = 0; i < seq_allowed.size(); ++i) {
     reduced_seq[i] = seq_allowed[i].first;
   }
   ReduceDegreeSequence(vertex, leftmost_adj_set, &reduced_seq);
@@ -102,15 +103,10 @@ bool SimpleGraphGenerator::CGTest(const int vertex,
 
 void SimpleGraphGenerator::GenerateAllAdjSets(const vector<int> &original_seq,
                                               set<int> *cur_set,
-                                              vector<set<int> > *adj_sets) {
-  if (cur_set->size() >= original_seq[0]) {
+                                              vector<set<int>> *adj_sets) {
+  if ((int) cur_set->size() >= original_seq[0]) {
     // This set is complete.
-    if (adj_sets->empty() ||
-        (!adj_sets->empty() && ColexCmp(*cur_set, adj_sets->front()))) {
-      adj_sets->push_back(*cur_set);
-    } else if(!adj_sets->empty()) {
-      printf("CoLex works!\n");
-    }
+    adj_sets->push_back(*cur_set);
     return;
   }
   int vertex = original_seq.size() - 1;
@@ -129,10 +125,10 @@ void SimpleGraphGenerator::GenerateAllAdjSets(const vector<int> &original_seq,
     int new_vertex_degree = original_seq[0] - cur_set->size();
 
     // Create the sequence reduced by the newly introduced edge.
-    vector<pair<int, bool> > new_seq;
+    vector<pair<int, bool>> new_seq;
 
     new_seq.push_back(make_pair(new_vertex_degree, false));
-    for (int i = 1; i < original_seq.size(); ++i) {
+    for (size_t i = 1; i < original_seq.size(); ++i) {
       new_seq.push_back(make_pair(original_seq[i], true));
     }
     for (auto it = cur_set->cbegin(); it != cur_set->cend(); ++it) {
@@ -159,8 +155,8 @@ void SimpleGraphGenerator::GenerateAllAdjSets(const vector<int> &original_seq,
 void SimpleGraphGenerator::GenerateAllGraphs(const vector<int> &seq,
                                              vector<Graph *> *graphs) {
   Graph g(seq.size());
-  vector<pair<int, int> > new_seq;
-  for (int i = 0; i < seq.size(); ++i) {
+  vector<pair<int, int>> new_seq;
+  for (size_t i = 0; i < seq.size(); ++i) {
     new_seq.push_back(make_pair(seq[i], i));
   }
   GenerateAllGraphs(new_seq, false, NULL, &g, graphs);
@@ -170,28 +166,26 @@ void SimpleGraphGenerator::GenerateAllUniqueGraphs(const vector<int> &seq,
                                                    GraphFilter *filter,
                                                    vector<Graph *> *graphs) {
   Graph g(seq.size());
-  vector<pair<int, int> > new_seq;
-  for (int i = 0; i < seq.size(); ++i) {
+  vector<pair<int, int>> new_seq;
+  for (int i = 0; i < (int) seq.size(); ++i) {
     new_seq.push_back(make_pair(seq[i], i));
   }
   GenerateAllGraphs(new_seq, true, filter, &g, graphs);
 }
 
 void SimpleGraphGenerator::GenerateAllGraphs(
-    const vector<pair<int, int> > &seq, // [ (deg, vertex), (deg, vertex), ...]
+    const vector<pair<int, int>> &seq, // [ (deg, vertex), (deg, vertex), ...]
     const bool unique_graphs_only, GraphFilter *filter, Graph *g,
     vector<Graph *> *graphs) {
   if (seq.front().first <= 0) {
-    ++count_all_graphs;
     if (!g->IsConnected()) {
       return; // We are only interested in connected graphs.
     }
-    ++count_connected_graphs;
     if (!unique_graphs_only) {
       graphs->push_back(new Graph(*g));
       return;
     }
-    for (int i = 0; i < graphs->size(); ++i) {
+    for (size_t i = 0; i < graphs->size(); ++i) {
       if (nauty_utils::IsomorphismChecker::AreIsomorphic(*(*graphs)[i], *g)) {
         return; // The generated graph is not unique.
       }
@@ -200,19 +194,19 @@ void SimpleGraphGenerator::GenerateAllGraphs(
     return;
   }
   vector<int> helper_seq;
-  for (int i = 0; i < seq.size(); ++i) {
+  for (size_t i = 0; i < seq.size(); ++i) {
     if (seq[i].first <= 0) {
       break;
     }
     helper_seq.push_back(seq[i].first);
   }
   set<int> helper_set;
-  vector<set<int> > adj_sets;
+  vector<set<int>> adj_sets;
   GenerateAllAdjSets(helper_seq, &helper_set, &adj_sets);
-  for (int i = 0; i < adj_sets.size(); ++i) {
+  for (size_t i = 0; i < adj_sets.size(); ++i) {
     const set<int> &curr_set = adj_sets[i];
 
-    vector<pair<int, int> > new_seq(seq);
+    vector<pair<int, int>> new_seq(seq);
     vector<int> actual_adj_vertices;
     new_seq[0].first = 0;
     for (auto it = curr_set.cbegin(); it != curr_set.cend(); ++it) {
@@ -220,13 +214,11 @@ void SimpleGraphGenerator::GenerateAllGraphs(
       actual_adj_vertices.push_back(seq[*it].second);
       --new_seq[*it].first; // reduce degree sequence
     }
-    if (!unique_graphs_only ||
-        (unique_graphs_only && filter->IsNewGraphAcceptable(
-                                   seq[0].second, actual_adj_vertices, *g))) {
+    if (!unique_graphs_only || (unique_graphs_only &&
+                                filter->IsNewGraphAcceptable(
+                                    seq[0].second, actual_adj_vertices, *g))) {
       std::sort(new_seq.rbegin(), new_seq.rend()); // reverse sort
       GenerateAllGraphs(new_seq, unique_graphs_only, filter, g, graphs);
-    } else {
-      ++count_prunings;
     }
     for (auto it = curr_set.cbegin(); it != curr_set.cend(); ++it) {
       g->RemoveEdge(seq[0].second, seq[*it].second); // remove temp edges
@@ -236,14 +228,14 @@ void SimpleGraphGenerator::GenerateAllGraphs(
 
 void
 SimpleGraphGenerator::GenerateAllDegreeSequences(const int n,
-                                                 vector<vector<int> > *seqs) {
+                                                 vector<vector<int>> *seqs) {
   vector<int> work_seq;
   SimpleGraphGenerator::GenerateAllDegreeSequences(n, &work_seq, seqs);
 }
 
 void SimpleGraphGenerator::GenerateAllDegreeSequences(
-    const int n, vector<int> *cur_seq, vector<vector<int> > *seqs) {
-  if (cur_seq->size() >= n) {
+    const int n, vector<int> *cur_seq, vector<vector<int>> *seqs) {
+  if ((int) cur_seq->size() >= n) {
     seqs->push_back(*cur_seq);
     return;
   }
@@ -259,26 +251,5 @@ void SimpleGraphGenerator::GenerateAllDegreeSequences(
   }
   cur_seq->erase(cur_seq->begin() + cur_seq->size() - 1);
 }
-
-// s1 < s2
-bool SimpleGraphGenerator::ColexCmp(const std::set<int> &s1,
-                                    const std::set<int> &s2) {
-  for (auto it1 = s1.crbegin(), it2 = s2.crbegin();
-       it1 != s1.crend() && it2 != s2.crend();
-       ++it1, ++it2) {
-    if ((*it1) == (*it2)) {
-      continue;
-    }
-    if ((*it1) < (*it2)) {
-      return true;
-    }
-    return false;
-  }
-  return true;
-}
-
-int SimpleGraphGenerator::count_all_graphs = 0;
-int SimpleGraphGenerator::count_connected_graphs = 0;
-int SimpleGraphGenerator::count_prunings = 0;
 
 } // namespace graph_utils

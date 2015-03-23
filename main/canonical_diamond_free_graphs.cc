@@ -1,4 +1,5 @@
-
+// A program to generate diamond-free graphs by using the canonical graph
+// generator.
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -18,13 +19,13 @@ namespace {
 void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
   std::ofstream f;
   f.open(filename, std::ios::app);
-  for (int i = 0; i < graphs.size(); ++i) {
+  for (size_t i = 0; i < graphs.size(); ++i) {
     if (!graphs[i]->IsConnected()) {
       continue;
     }
     vector<string> matrix;
     graphs[i]->GetAdjMatrix(&matrix);
-    for (int j = 0; j < matrix.size(); ++j) {
+    for (size_t j = 0; j < matrix.size(); ++j) {
       f << matrix[j] << std::endl;
     }
     f << std::endl;
@@ -32,12 +33,19 @@ void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
   f.close();
   return;
 }
-}  // namespace
+
+} // namespace
 
 int main() {
-  CanonicalGraphGenerator gen(8, new DiamondFreeGraph());
+  const int kGraphOrder = 8;
+  const string kFileName = "canonical_dfg_8.txt";
+  CanonicalGraphGenerator gen(kGraphOrder, new DiamondFreeGraph());
   vector<Graph *> *graphs = new vector<Graph *>();
-  gen.GenerateGraphs(&graphs, true );
+  printf("Generating diamond-free graphs of order %d\n", kGraphOrder);
+  gen.GenerateGraphs(&graphs, true);
   ExportGraphsToFile("canonical_dfg_8.txt", *graphs);
+  printf("Adjacency matrices for the final graphs are exported into the "
+         "file: %s\n",
+         kFileName.c_str());
   return 0;
 }

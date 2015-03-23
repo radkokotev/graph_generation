@@ -1,3 +1,4 @@
+// Implementation of the canonical graph generation algorithm.
 #include "canonical_graph_generator.h"
 
 #include <algorithm>
@@ -27,8 +28,7 @@ void DeleteVectorOfGraphs(vector<Graph *> *v) {
   }
 }
 
-}  // namespace
-
+} // namespace
 
 CanonicalGraphGenerator::CanonicalGraphGenerator(const int n,
                                                  CanonicalGraphFilter *filter) {
@@ -36,35 +36,36 @@ CanonicalGraphGenerator::CanonicalGraphGenerator(const int n,
   target_size_ = n;
 }
 
-void CanonicalGraphGenerator::GenerateUpperObjects(
-    const Graph &g, vector<Graph *> *upper_obj) {
+void CanonicalGraphGenerator::GenerateUpperObjects(const Graph &g,
+                                                   vector<Graph *> *upper_obj) {
   const int n = g.size();
   vector<vector<int> *> all_subsets;
   filter_->GetAllSubsetOfVertices(n, &all_subsets);
-  for (int i = 0; i < all_subsets.size(); ++i) {
+  for (size_t i = 0; i < all_subsets.size(); ++i) {
     if (!filter_->IsSubsetSafe(g, *all_subsets[i])) {
       // Only safe sequences can be considered.
       continue;
     }
-    // TODO(radkokotev) Improve implementation here.
+    // TODO(radkokotev) Improve implementation here. Manipulating strings may be
+    // slower than directly creating a new graph.
     vector<string> matrix;
     g.GetAdjMatrix(&matrix);
     string newline = "";
-    for (int j = 0; j < matrix.size(); ++j) {
+    for (size_t j = 0; j < matrix.size(); ++j) {
       bool is_vertex_in_set =
           std::binary_search(all_subsets[i]->begin(), all_subsets[i]->end(), j);
       matrix[j] += is_vertex_in_set ? "1" : "0";
       newline += is_vertex_in_set ? "1" : "0";
     }
-    newline += "0";  // graph is simple
+    newline += "0"; // graph is simple
     // Add the new line to the matrix and create the new graph.
     matrix.push_back(newline);
     upper_obj->push_back(new Graph(matrix));
   }
 }
 
-void CanonicalGraphGenerator::GenerateLowerObjects(
-    const Graph &g, vector<Graph *> *lower_obj) {
+void CanonicalGraphGenerator::GenerateLowerObjects(const Graph &g,
+                                                   vector<Graph *> *lower_obj) {
   const int n = g.size();
   if (n <= 1) {
     return;
@@ -77,25 +78,26 @@ void CanonicalGraphGenerator::GenerateLowerObjects(
   }
 }
 
-void CanonicalGraphGenerator::GetAllRelatedLowerObjects(
-    const Graph &g, vector<Graph *> *lower_obj) {
+void
+CanonicalGraphGenerator::GetAllRelatedLowerObjects(const Graph &g,
+                                                   vector<Graph *> *lower_obj) {
   GenerateLowerObjects(g, lower_obj);
 }
 
-void CanonicalGraphGenerator::FindGraphsFromLowerObject(
-    const Graph &lower_obj, vector<Graph *> *graphs) {
+void
+CanonicalGraphGenerator::FindGraphsFromLowerObject(const Graph &lower_obj,
+                                                   vector<Graph *> *graphs) {
   vector<Graph *> candidates;
   GenerateUpperObjects(lower_obj, &candidates);
-  for (int i = 0; i < candidates.size(); ++i) {
+  for (size_t i = 0; i < candidates.size(); ++i) {
     vector<int> can_lab;
     IsomorphismChecker::GetCanonicalLabeling(*candidates[i], &can_lab);
     Graph *reduced;
     int vertex_to_remove =
         std::find(can_lab.begin(), can_lab.end(), 0) - can_lab.begin();
-    filter_->ReduceGraphByRemovingVertex(
-        *candidates[i], vertex_to_remove, &reduced);
+    filter_->ReduceGraphByRemovingVertex(*candidates[i], vertex_to_remove,
+                                         &reduced);
     if (IsomorphismChecker::AreIsomorphic(lower_obj, *reduced)) {
-      // TODO(radkokotev) Check only for automorphism.
       graphs->push_back(new Graph(*candidates[i]));
     }
     delete reduced;
@@ -106,11 +108,10 @@ void CanonicalGraphGenerator::FindGraphsFromLowerObject(
   }
 }
 
-
 void CanonicalGraphGenerator::GenerateGraphs(vector<Graph *> **result,
                                              bool print_messages) {
   vector<Graph *> *cur = new vector<Graph *>();
-  vector<Graph *> *next;
+  vector<Graph *> *next = nullptr;
 
   Graph *k2 = new Graph(2);
   k2->AddEdge(0, 1);
@@ -121,35 +122,17 @@ void CanonicalGraphGenerator::GenerateGraphs(vector<Graph *> **result,
     std::clock_t start = std::clock();
     IsomorphismChecker checker(true);
 
-    for (int graph_index = 0; graph_index < cur->size(); ++graph_index) {
+    for (size_t graph_index = 0; graph_index < cur->size(); ++graph_index) {
       const Graph &g = *(*cur)[graph_index];
       vector<Graph *> upper_obj;
       GenerateUpperObjects(g, &upper_obj);
       while (!upper_obj.empty()) {
         if (!checker.AddGraphToCheck(upper_obj.back())) {
+          // This graph is isomorphic to one already generated. Don't store it.
           delete upper_obj.back();
         }
         upper_obj.pop_back();
       }
-      // for (int i = 0; i < upper_obj.size(); ++i) {
-      //   vector<Graph *> related_lower_obj;
-      //   GetAllRelatedLowerObjects(*upper_obj[i], &related_lower_obj);
-      //   vector<Graph *> originals;
-      //   for (int lower_index = 0;
-      //       lower_index < related_lower_obj.size() && originals.empty();
-      //       ++lower_index) {
-      //     FindGraphsFromLowerObject(*related_lower_obj[lower_index],
-      //                               &originals);
-      //   }
-      //   DeleteVectorOfGraphs(&related_lower_obj);
-      //   while (!originals.empty()) {
-      //     if (!checker.AddGraphToCheck(originals.back())) {
-      //       delete originals.back();
-      //     }
-      //     originals.pop_back();
-      //   }
-      // }
-      // DeleteVectorOfGraphs(&upper_obj);
     }
     checker.GetAllNonIsomorphicGraphs(next);
     DeleteVectorOfGraphs(cur);
@@ -158,15 +141,15 @@ void CanonicalGraphGenerator::GenerateGraphs(vector<Graph *> **result,
 
     if (print_messages) {
       int connected = 0;
-      for (int i = 0; i < next->size(); ++i) {
+      for (size_t i = 0; i < next->size(); ++i) {
         if ((*next)[i]->IsConnected()) {
           ++connected;
         }
       }
-      printf("For n = %d there are in total %d graphs; connected -> %d",
-             n, next->size(), connected);
+      printf("For v = %d there are in total %lu graphs; connected -> %d", n,
+             next->size(), connected);
       printf("  Time: %.3f ms\n",
-           (std::clock() - start) / (double)(CLOCKS_PER_SEC) * 1000);
+             (std::clock() - start) / (double)(CLOCKS_PER_SEC) * 1000);
     }
   }
   *result = next;

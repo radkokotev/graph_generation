@@ -1,3 +1,7 @@
+// Implementation of girth filters. Firstly, a specialized girth filter for
+// triangle- and square-free graphs is implemented. Then a generic filter for
+// graphs of minimum girth is implemented.
+
 #include "girth_5_graph.h"
 
 #include <set>
@@ -16,12 +20,12 @@ namespace graph_utils {
 //////////////////////// Implementation of girth 5 /////////////////////////////
 bool Girth5Graph::IsSubsetSafe(const Graph &g,
                                const vector<int> &subset) const {
-  for (int i = 0; i < subset.size(); ++i) {
+  for (size_t i = 0; i < subset.size(); ++i) {
     int a = subset[i];
-    for (int j = i + 1; j < subset.size(); ++j) {
+    for (size_t j = i + 1; j < subset.size(); ++j) {
       int b = subset[j];
       if (g.HasEdge(a, b)) {
-        return false;  // triangle;
+        return false; // triangle;
       }
       for (int c = 0; c < g.size(); ++c) {
         if (a == c || b == c) {
@@ -38,21 +42,21 @@ bool Girth5Graph::IsSubsetSafe(const Graph &g,
 
 bool Girth5Graph::IsNewGraphAcceptable(const int cur_vertex,
                                        const Graph &g) const {
-   return GirthNGraph::IsNewGraphAcceptable(cur_vertex, g, 5);
+  return GirthNGraph::IsNewGraphAcceptable(cur_vertex, g, 5);
 }
 
 bool Girth5Graph::IsNewGraphAcceptable(const int cur_vertex,
                                        const vector<int> &new_adj_vertices,
                                        const Graph &g) const {
   // Check for additional triangles and squares.
-  for (int i = 0; i < new_adj_vertices.size(); ++i) {
+  for (size_t i = 0; i < new_adj_vertices.size(); ++i) {
     const int a = new_adj_vertices[i];
     for (int b = 0; b < g.size(); ++b) {
       if (b == a || b == cur_vertex) {
         continue;
       }
       if (g.HasEdge(cur_vertex, b) && g.HasEdge(a, b)) {
-        return false;  // Triangle.
+        return false; // Triangle.
       }
       for (int c = b + 1; c < g.size(); ++c) {
         if (c == a || c == cur_vertex || !g.HasEdge(b, c)) {
@@ -60,7 +64,7 @@ bool Girth5Graph::IsNewGraphAcceptable(const int cur_vertex,
         }
         if ((g.HasEdge(cur_vertex, b) && g.HasEdge(a, c)) ||
             (g.HasEdge(cur_vertex, c) && g.HasEdge(a, b))) {
-          return false;  // Square (i.e. cycle of length 4)
+          return false; // Square (i.e. cycle of length 4)
         }
       }
     }
@@ -90,7 +94,7 @@ bool GirthNGraph::IsSubsetSafe(const Graph &g,
       }
     }
   }
-  for (int i = 0; i < subset.size(); ++i) {
+  for (size_t i = 0; i < subset.size(); ++i) {
     new_graph.AddEdge(subset[i], n);
   }
   return IsNewGraphAcceptable(n, new_graph);
@@ -98,7 +102,7 @@ bool GirthNGraph::IsSubsetSafe(const Graph &g,
 
 bool GirthNGraph::IsNewGraphAcceptable(const int cur_vertex,
                                        const Graph &g) const {
-  IsNewGraphAcceptable(cur_vertex, g, girth_);
+  return IsNewGraphAcceptable(cur_vertex, g, girth_);
 }
 
 bool GirthNGraph::IsNewGraphAcceptable(const int cur_vertex,
@@ -107,25 +111,25 @@ bool GirthNGraph::IsNewGraphAcceptable(const int cur_vertex,
   return IsNewGraphAcceptable(cur_vertex, g);
 }
 
-bool GirthNGraph::IsNewGraphAcceptable(const int cur_vertex,
-                                       const Graph &g,
+bool GirthNGraph::IsNewGraphAcceptable(const int cur_vertex, const Graph &g,
                                        const int girth) {
   // a pair represents cur_vertex, source_vertex.
-  std::unique_ptr<set<pair<int,int> > > curr_layer(new set<pair<int,int> >());
-  std::unique_ptr<set<pair<int,int> > > next_layer(new set<pair<int,int> >());
+  std::unique_ptr<set<pair<int, int>>> curr_layer(new set<pair<int, int>>());
+  std::unique_ptr<set<pair<int, int>>> next_layer(new set<pair<int, int>>());
 
   curr_layer->insert(std::make_pair(cur_vertex, cur_vertex));
   int layers_traversed = 1;
   while (layers_traversed < girth) {
     for (auto vertex = curr_layer->begin(); vertex != curr_layer->end();
-        ++vertex) {
+         ++vertex) {
       for (int j = 0; j < g.size(); ++j) {
-        // If this is the same vertex, or we are trying to go back, skip it.
+        // If this is the same vertex, or we are trying to go back. Skip it.
         if (j == vertex->first || j == vertex->second ||
             !g.HasEdge(vertex->first, j)) {
           continue;
         }
         if (layers_traversed > 2 && j == cur_vertex) {
+          // The graph contains a cycle of length less than the given one.
           return false;
         }
         next_layer->insert(std::make_pair(j, vertex->first));
@@ -133,7 +137,7 @@ bool GirthNGraph::IsNewGraphAcceptable(const int cur_vertex,
     }
     curr_layer->clear();
     curr_layer.reset(next_layer.release());
-    next_layer.reset(new set<pair<int,int> >());
+    next_layer.reset(new set<pair<int, int>>());
     ++layers_traversed;
   }
   return true;
@@ -149,4 +153,3 @@ bool GirthNGraph::IsGirthNGraph(const Graph &g) const {
 }
 
 } // namespace graph_utils
-

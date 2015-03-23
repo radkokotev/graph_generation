@@ -24,7 +24,7 @@ int GetMaxGirth(const Graph &g) {
   int max_girth = 0;
   for (int i = 3; i < g.size(); ++i) {
     filter.reset(new GirthNGraph(i));
-    if(!filter->IsGirthNGraph(g)) {
+    if (!filter->IsGirthNGraph(g)) {
       max_girth = i - 1;
       break;
     }
@@ -37,7 +37,7 @@ int ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
   f.open(filename, std::ios::app);
   int max_edges = 0;
   vector<Graph *> extremal;
-  for (int i = 0; i < graphs.size(); ++i) {
+  for (size_t i = 0; i < graphs.size(); ++i) {
     if (!graphs[i]->IsConnected()) {
       continue;
     }
@@ -51,7 +51,7 @@ int ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
     }
     vector<string> matrix;
     graphs[i]->GetAdjMatrix(&matrix);
-    for (int j = 0; j < matrix.size(); ++j) {
+    for (size_t j = 0; j < matrix.size(); ++j) {
       f << matrix[j] << std::endl;
     }
     f << std::endl;
@@ -59,29 +59,30 @@ int ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
   f.close();
 
   int max_girth = 0;
-  for (int i = 0; i < extremal.size(); ++i) {
+  for (size_t i = 0; i < extremal.size(); ++i) {
     max_girth = std::max(max_girth, GetMaxGirth(*extremal[i]));
   }
-  printf("(count,size,max_girth) =  (%d,%d,%d)\n",
-         extremal.size(), max_edges, max_girth);
+  printf("(count,size,max_girth) =  (%lu,%d,%d)\n", extremal.size(), max_edges,
+         max_girth);
   return max_girth;
 }
-}  // namespace
+} // namespace
 
 int main() {
-  const int max_order = 20;
-  for (int order = 3; order < max_order; ++order) {
-      GirthNGraph filter(10);
-      CanonicalGraphGenerator gen(order, &filter);
-      vector<Graph *> *graphs = new vector<Graph *>();
-      printf("Order = %d\n", order);
-      gen.GenerateGraphs(&graphs, true );
-      int max_girth =
-          ExportGraphsToFile("canonical_girth_5_order_temp.txt", *graphs);
+  const int kMaxOrder = 10;
+  const int kMinGraphGirth = 10;
+  printf("Generating graphs of minimum girth %d\n", kMinGraphGirth);
+  for (int order = 3; order < kMaxOrder; ++order) {
+    GirthNGraph filter(kMinGraphGirth);
+    CanonicalGraphGenerator gen(order, &filter);
+    vector<Graph *> *graphs = new vector<Graph *>();
+    gen.GenerateGraphs(&graphs, true);
+    const string filename = "results/canonical_girth_" +
+                            std::to_string(kMinGraphGirth) + "_order_" +
+                            std::to_string(order) + ".txt";
+    ExportGraphsToFile(filename, *graphs);
+    printf("Generated graphs of order %d. Exported to file %s\n", order,
+           filename.c_str());
   }
-  // CanonicalGraphGenerator gen(13, new Girth5Graph());
-  // vector<Graph *> *graphs = new vector<Graph *>();
-  // gen.GenerateGraphs(&graphs, true );
-  // ExportGraphsToFile("canonical_girth_5_order_temp.txt", *graphs);
   return 0;
 }

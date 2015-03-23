@@ -1,4 +1,5 @@
-// A main program to generate all diamond free graphs with N vertices.
+// A main program to generate all triangle- and square- free graphs with N
+// vertices.
 
 #include <stdio.h>
 #include <vector>
@@ -17,34 +18,33 @@ using std::queue;
 using graph_utils::SimpleGraphGenerator;
 using graph_utils::Graph;
 using graph_utils::Girth5Graph;
-using graph_utils::GirthNGraph;
 using nauty_utils::IsomorphismChecker;
 
 namespace {
 
-const int kNumberOfVertices = 10;
-const int kGraphSize = 15;
-const char kExportFileName[] = "girth_5_order_temp.txt";
+const int kNumberOfVertices = 8;
+const string kExportFileName = "girth_5_order_temp.txt";
 
 int64_t final_count = 0;
 int64_t all_graphs_count = 0;
 int64_t all_connected_diamond_free_count = 0;
 
-
-bool IsGraphExtremal(const Graph& g) {
-  int kExtremalSizes[] = {0, 0, 1, 2, 3, 5, 6, 8, 10, 12, 15, 16, 18, 21, 23,
-                          26, 28, 31, 34, 38, 41, 44, 47, 50, 54, 57, 61, 65,
-                          68, 72, 76};
+bool IsGraphExtremal(const Graph &g) {
+  // Numbers taken from
+  // http://www.dcs.gla.ac.uk/~pat/jchoco/extremal/papers/10.1.1.92.3502.pdf
+  int kExtremalSizes[] = {0,  0,  1,  2,  3,  5,  6,  8,  10, 12, 15,
+                          16, 18, 21, 23, 26, 28, 31, 34, 38, 41, 44,
+                          47, 50, 54, 57, 61, 65, 68, 72, 76};
   return kExtremalSizes[g.size()] == g.GetNumberOfEdges();
 }
 
 void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
   std::ofstream f;
   f.open(filename, std::ios::app);
-  for (int i = 0; i < graphs.size(); ++i) {
+  for (size_t i = 0; i < graphs.size(); ++i) {
     vector<string> matrix;
     graphs[i]->GetAdjMatrix(&matrix);
-    for (int j = 0; j < matrix.size(); ++j) {
+    for (size_t j = 0; j < matrix.size(); ++j) {
       f << matrix[j] << std::endl;
     }
     f << std::endl;
@@ -55,12 +55,11 @@ void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
 
 void ExportAllNonIsomorphicGraphsForSequence(const vector<int> &seq) {
   vector<Graph *> all_graphs;
-  GirthNGraph filter(5);
-  // SimpleGraphGenerator::GenerateAllUniqueGraphs(seq, &filter, &all_graphs);
-  SimpleGraphGenerator::GenerateAllGraphs(seq, &all_graphs);
+  Girth5Graph filter;
+  SimpleGraphGenerator::GenerateAllUniqueGraphs(seq, &filter, &all_graphs);
   bool should_export = false;
   vector<Graph *> extremal_graphs;
-  for (int i = 0; i < all_graphs.size(); ++i) {
+  for (size_t i = 0; i < all_graphs.size(); ++i) {
     if (IsGraphExtremal(*all_graphs[i])) {
       extremal_graphs.push_back(all_graphs[i]);
     }
@@ -83,41 +82,17 @@ void ExportAllNonIsomorphicGraphsForSequence(const vector<int> &seq) {
 } // namespace
 
 int main() {
-  vector<vector<int> > seqs;
+  vector<vector<int>> seqs;
   std::clock_t start = std::clock();
   SimpleGraphGenerator::GenerateAllDegreeSequences(kNumberOfVertices, &seqs);
-  printf("Total seqs are %d\n", seqs.size());
-  SimpleGraphGenerator::count_all_graphs = 0;
-  SimpleGraphGenerator::count_connected_graphs = 0;
-  SimpleGraphGenerator::count_prunings = 0;
-  for (int i = 0; i < seqs.size(); ++i) {
-    // if (i % 100 == 0)
-    //   printf("Done with %d\n", i);
-    // if (i > 42000 && i % 10 == 0)
-    //   printf("Done with %d\n", i);
-    int sum = 0;
-    for (int j = 0; j < seqs[i].size(); ++j) {
-      sum += seqs[i][j];
-    }
-    if (sum != 2*kGraphSize) {
-      continue;
-    }
+  printf("Number of degree sequences is %lu\n", seqs.size());
+  for (size_t i = 0; i < seqs.size(); ++i) {
     ExportAllNonIsomorphicGraphsForSequence(seqs[i]);
   }
 
-  // printf("Number of vertices is %d\n", kNumberOfVertices);
-  // printf("The number of graph generated is %lld\n", all_graphs_count);
-  // printf("The number of connected diamond-free graphs is %lld\n",
-  //        all_connected_diamond_free_count);
-  // printf("The number of unique connected diamond-free graphs is %lld\n",
-  //        final_count);
-  printf("Number of vertices is %d\n", kNumberOfVertices);
-  printf("The number of graph generated is %lld\n", SimpleGraphGenerator::count_all_graphs);
-  printf("The number of connected girth 5 graphs is %lld\n",
-         SimpleGraphGenerator::count_connected_graphs);
-  printf("The number of unique connected diamond-free graphs is %lld\n",
-         final_count);
-  printf("Number of prunings: %d\n", SimpleGraphGenerator::count_prunings);
+  printf("The number of extremal triangle- and square-free graphs of "
+         "order %d is %ld\n",
+         kNumberOfVertices, final_count);
   printf("Time: %.3f ms\n",
          (std::clock() - start) / (double)(CLOCKS_PER_SEC) * 1000);
   return 0;

@@ -1,5 +1,5 @@
 // Graph generator to generate graph of order n by following a canonical
-// construction path. The implementation is based on McKAy's article:
+// construction path. The implementation is based on McKay's article:
 // http://cs.anu.edu.au/~bdm/papers/orderly.pdf
 
 #ifndef GRAPH_UTILS_CANONICAL_GRAPH_GENERATOR_H_
@@ -13,7 +13,7 @@
 namespace graph_utils {
 
 class CanonicalGraphGenerator {
- public:
+public:
   CanonicalGraphGenerator(const int n, CanonicalGraphFilter *filter);
 
   // Generates all upper objects <g, W> for the given graph g.
@@ -34,7 +34,8 @@ class CanonicalGraphGenerator {
 
   // Generates all graph by canonical construction.
   void GenerateGraphs(vector<Graph *> **result, bool print_messages = false);
- private:
+
+private:
   int target_size_;
   CanonicalGraphFilter *filter_;
 };
