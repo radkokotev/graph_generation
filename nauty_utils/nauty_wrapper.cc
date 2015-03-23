@@ -6,9 +6,7 @@
 
 namespace nauty_utils {
 
-IsomorphismChecker::IsomorphismChecker(bool optimize) {
-  optimize_ = optimize;
-}
+IsomorphismChecker::IsomorphismChecker(bool optimize) { optimize_ = optimize; }
 
 bool IsomorphismChecker::AddGraphToCheck(Graph *g) {
   vector<Graph *> *graphs;
@@ -17,7 +15,7 @@ bool IsomorphismChecker::AddGraphToCheck(Graph *g) {
   } else {
     graphs = &graphs_;
   }
-  for (int i = 0; i < graphs->size(); ++i) {
+  for (size_t i = 0; i < graphs->size(); ++i) {
     if (AreIsomorphic(*(*graphs)[i], *g)) {
       return false;
     }
@@ -31,8 +29,8 @@ void IsomorphismChecker::GetAllNonIsomorphicGraphs(vector<Graph *> *v) const {
     v->insert(v->begin(), graphs_.begin(), graphs_.end());
     return;
   }
-  for (auto it = degree_to_graphs_.begin();
-      it != degree_to_graphs_.end(); ++it) {
+  for (auto it = degree_to_graphs_.begin(); it != degree_to_graphs_.end();
+       ++it) {
     v->insert(v->end(), it->second.begin(), it->second.end());
   }
 }

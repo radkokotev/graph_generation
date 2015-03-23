@@ -1,3 +1,4 @@
+// Implementation of Graph.
 
 #include "graph.h"
 
@@ -74,24 +75,23 @@ bool Graph::IsConnected() const {
       }
     }
   }
-  return visited_nodes.size() == size();
+  return visited_nodes.size() == (size_t) size();
 }
-
 
 int Graph::GetNumberOfEdges() const {
   int count = 0;
-  for (int i = 0; i < adj_matrix_.size(); ++i) {
+  for (size_t i = 0; i < adj_matrix_.size(); ++i) {
     if (adj_matrix_[i]) {
       ++count;
     }
   }
-  count /= 2;  // Assuming the graph is simple and there are not self edges.
+  count /= 2; // Assuming the graph is simple and there are not self edges.
   return count;
 }
 
 string Graph::GetDegSeqString() const {
   string result = "";
-  for (int i = 0; i < adj_matrix_.size();) {
+  for (size_t i = 0; i < adj_matrix_.size();) {
     int count = 0;
     for (int k = 0; k < size_; ++k, ++i) {
       if (adj_matrix_[i]) {

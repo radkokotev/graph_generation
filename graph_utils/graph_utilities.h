@@ -41,16 +41,16 @@ public:
   // used to create all upper graphs for a given graph. Basic implementation is
   // provided, no need to override. However, speed-ups are expected if subset
   // elimination is done in  a clever way here.
-  virtual void GetAllSubsetOfVertices(
-      const int n, std::vector<std::vector<int> *> *all_subsets) const;
+  virtual void
+  GetAllSubsetOfVertices(const int n,
+                         std::vector<std::vector<int> *> *all_subsets) const;
 
   // This method creates a graph, which is the lower object of the given graph
   // 'g' by removing vertex 'v' from it, and all edges incident on 'v'.
   //
   // Ownership of the new graph is transferred to the caller. Basic
   // implementation is provided, no need to override.
-  virtual void ReduceGraphByRemovingVertex(const Graph &g,
-                                           const int v,
+  virtual void ReduceGraphByRemovingVertex(const Graph &g, const int v,
                                            Graph **result) const;
 };
 
@@ -59,7 +59,7 @@ public:
 // canonical graph generator.
 class DiamondFreeGraph : public CanonicalGraphFilter, public GraphFilter {
 public:
-  DiamondFreeGraph() {};
+  DiamondFreeGraph(){};
   virtual ~DiamondFreeGraph() {}
 
   // Override abstract method from CanonicalGraphFilter.

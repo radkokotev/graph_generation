@@ -25,7 +25,7 @@ public:
 private:
   bool optimize_;
   vector<Graph *> graphs_;
-  map<std::string, vector<Graph *> > degree_to_graphs_;
+  map<std::string, vector<Graph *>> degree_to_graphs_;
 };
 
 } // namespace nauty_utils

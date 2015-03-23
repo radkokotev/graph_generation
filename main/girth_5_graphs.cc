@@ -1,17 +1,15 @@
-// A main program to generate all diamond free graphs with N vertices.
+// A main program to generate all triangle- and square- free graphs with N
+// vertices.
 
 #include <stdio.h>
 #include <vector>
-#include <thread>
-#include <mutex>
 #include <queue>
-#include <condition_variable>
 #include <ctime>
 #include <iostream>
 #include <fstream>
 
+#include "graph_utils/girth_5_graph.h"
 #include "graph_utils/graph.h"
-#include "graph_utils/graph_utilities.h"
 #include "graph_utils/graph_generator.h"
 #include "nauty_utils/nauty_wrapper.h"
 
@@ -19,15 +17,24 @@ using std::vector;
 using std::queue;
 using graph_utils::SimpleGraphGenerator;
 using graph_utils::Graph;
-using graph_utils::DiamondFreeGraph;
+using graph_utils::Girth5Graph;
 using nauty_utils::IsomorphismChecker;
 
 namespace {
 
 const int kNumberOfVertices = 8;
-const char kExportFileName[] = "temp_diamond_free_10.txt";
+const string kExportFileName = "girth_5_order_temp.txt";
 
 int64_t final_count = 0;
+
+bool IsGraphExtremal(const Graph &g) {
+  // Numbers taken from
+  // http://www.dcs.gla.ac.uk/~pat/jchoco/extremal/papers/10.1.1.92.3502.pdf
+  int kExtremalSizes[] = {0,  0,  1,  2,  3,  5,  6,  8,  10, 12, 15,
+                          16, 18, 21, 23, 26, 28, 31, 34, 38, 41, 44,
+                          47, 50, 54, 57, 61, 65, 68, 72, 76};
+  return kExtremalSizes[g.size()] == g.GetNumberOfEdges();
+}
 
 void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
   std::ofstream f;
@@ -46,17 +53,22 @@ void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
 
 void ExportAllNonIsomorphicGraphsForSequence(const vector<int> &seq) {
   vector<Graph *> all_graphs;
-  DiamondFreeGraph filter;
-
+  Girth5Graph filter;
   SimpleGraphGenerator::GenerateAllUniqueGraphs(seq, &filter, &all_graphs);
   bool should_export = false;
-  if (!all_graphs.empty()) {
-    final_count += all_graphs.size();
+  vector<Graph *> extremal_graphs;
+  for (size_t i = 0; i < all_graphs.size(); ++i) {
+    if (IsGraphExtremal(*all_graphs[i])) {
+      extremal_graphs.push_back(all_graphs[i]);
+    }
+  }
+  if (!extremal_graphs.empty()) {
+    final_count += extremal_graphs.size();
     should_export = true;
   }
 
   if (should_export) {
-    ExportGraphsToFile(kExportFileName, all_graphs);
+    ExportGraphsToFile(kExportFileName, extremal_graphs);
   }
 
   while (!all_graphs.empty()) {
@@ -75,10 +87,10 @@ int main() {
   for (size_t i = 0; i < seqs.size(); ++i) {
     ExportAllNonIsomorphicGraphsForSequence(seqs[i]);
   }
-  printf("The number of unique connected diamond-free graphs "
-         "of order %d is %ld\n",
+
+  printf("The number of extremal triangle- and square-free graphs of "
+         "order %d is %ld\n",
          kNumberOfVertices, final_count);
-  printf("Exporting all graphs to file %s\n", kExportFileName);
   printf("Time: %.3f ms\n",
          (std::clock() - start) / (double)(CLOCKS_PER_SEC) * 1000);
   return 0;

@@ -46,7 +46,7 @@ protected:
 };
 
 TEST_F(IsomorphismCheckerTest, OneGraph) {
-  vector<string> v({ "000", "000", "000" });
+  vector<string> v({"000", "000", "000"});
   Graph g(v);
   ASSERT_TRUE(checker_->AddGraphToCheck(&g));
   vector<Graph *> graphs;
@@ -58,8 +58,8 @@ TEST_F(IsomorphismCheckerTest, OneGraph) {
 }
 
 TEST_F(IsomorphismCheckerTest, TwoNonIsomorphicGraphs) {
-  vector<string> v1({ "000", "000", "000" });
-  vector<string> v2({ "010", "100", "000" });
+  vector<string> v1({"000", "000", "000"});
+  vector<string> v2({"010", "100", "000"});
   Graph g1(v1);
   Graph g2(v2);
   ASSERT_TRUE(checker_->AddGraphToCheck(&g1));
@@ -81,8 +81,8 @@ TEST_F(IsomorphismCheckerTest, TwoNonIsomorphicGraphs) {
 }
 
 TEST_F(IsomorphismCheckerTest, TwoIsomorphicGraphs) {
-  vector<string> v1({ "001", "000", "100" });
-  vector<string> v2({ "010", "100", "000" });
+  vector<string> v1({"001", "000", "100"});
+  vector<string> v2({"010", "100", "000"});
   Graph g1(v1);
   Graph g2(v2);
   ASSERT_TRUE(checker_->AddGraphToCheck(&g1));
@@ -97,9 +97,9 @@ TEST_F(IsomorphismCheckerTest, TwoIsomorphicGraphs) {
 }
 
 TEST_F(IsomorphismCheckerTest, ThreeGraph_TwoIsomorphic) {
-  vector<string> v1({ "000", "000", "000" });
-  vector<string> v2({ "001", "000", "100" });
-  vector<string> v3({ "010", "100", "000" });
+  vector<string> v1({"000", "000", "000"});
+  vector<string> v2({"001", "000", "100"});
+  vector<string> v3({"010", "100", "000"});
   Graph g1(v1);
   Graph g2(v2);
   Graph g3(v3);
@@ -147,28 +147,28 @@ TEST_F(IsomorphismCheckerTest, RealData_32) {
 }
 
 TEST_F(IsomorphismCheckerTest, CanonicalLabeling) {
-  vector<string> v1({ "011", "100", "100" });
-  vector<string> v2({ "001", "000", "100" });
-  vector<string> v3({ "01110", "10101", "11000", "10001", "01010" });
+  vector<string> v1({"011", "100", "100"});
+  vector<string> v2({"001", "000", "100"});
+  vector<string> v3({"01110", "10101", "11000", "10001", "01010"});
   Graph g1(v1);
   Graph g2(v2);
   Graph g3(v3);
   {
     vector<int> labels;
     IsomorphismChecker::GetCanonicalLabeling(g1, &labels);
-    vector<int> expected({ 1, 2, 0 });
+    vector<int> expected({1, 2, 0});
     ExpectVectorsEq<int>(expected, labels);
   }
   {
     vector<int> labels;
     IsomorphismChecker::GetCanonicalLabeling(g2, &labels);
-    vector<int> expected({ 1, 0, 2 });
+    vector<int> expected({1, 0, 2});
     ExpectVectorsEq<int>(expected, labels);
   }
   {
     vector<int> labels;
     IsomorphismChecker::GetCanonicalLabeling(g3, &labels);
-    vector<int> expected({ 3, 4, 2, 0, 1 });
+    vector<int> expected({3, 4, 2, 0, 1});
     ExpectVectorsEq<int>(expected, labels);
   }
 }
