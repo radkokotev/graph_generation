@@ -7,6 +7,7 @@
 //      callgeng_generic_girth.cc geng.c girth_5_graph.o graph_utilities.o \
 //      graph.o gtools.o nauty1.o nautil1.o naugraph1.o schreier.o naurng.o
 
+#include <ctime>
 #include <set>
 #include <utility>
 #include <vector>
@@ -115,6 +116,7 @@ int main(int argc, char *argv[]) {
 
   counter = 0;
   max_size = 0;
+  std::clock_t start = std::clock();
   GENG_MAIN(geng_argc, geng_argv);
 
   printf("Total number of graphs = %lu, Number of extremal DFGs = %lu, "
@@ -122,5 +124,7 @@ int main(int argc, char *argv[]) {
          all_graphs,
          counter,
          max_size);
+  printf("Time: %.3f ms\n",
+         (std::clock() - start) / (double)(CLOCKS_PER_SEC) * 1000);
   return 0;
 }
