@@ -1,3 +1,4 @@
+// A program to generate graphs of minimum girth N.
 #include <algorithm>
 #include <fstream>
 #include <iostream>

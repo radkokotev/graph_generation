@@ -29,7 +29,7 @@ TESTS = graph_test.exe graph_utilities_test.exe girth_5_graph_test.exe \
 
 # All programs produced by this Makefile.
 MAINS = diamond_free_graphs.exe canonical_diamond_free_graphs.exe \
-        girth_5_graphs.exe canonical_girth_5_graphs.exe \
+        girth_5_graphs.exe canonical_girth_n_graphs.exe \
         callgeng_generic_girth.exe callgeng_generic_dfg.exe
 
 # All Google Test headers.
@@ -190,10 +190,10 @@ girth_5_graphs.exe : girth_5_graphs.o girth_5_graph.o graph_utilities.o graph_ge
                           $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
 
-canonical_girth_5_graphs.o : $(MAIN_DIR)/canonical_girth_5_graphs.cc
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(MAIN_DIR)/canonical_girth_5_graphs.cc
+canonical_girth_n_graphs.o : $(MAIN_DIR)/canonical_girth_n_graphs.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(MAIN_DIR)/canonical_girth_n_graphs.cc
 
-canonical_girth_5_graphs.exe : canonical_girth_5_graphs.o girth_5_graph.o canonical_graph_generator.o graph.o \
+canonical_girth_n_graphs.exe : canonical_girth_n_graphs.o girth_5_graph.o canonical_graph_generator.o graph.o \
                                     graph_utilities.o nauty_wrapper.o $(NAUTY_DIR)/nauty.o $(NAUTY_DIR)/nautil.o \
                                     $(NAUTY_DIR)/naugraph.o $(NAUTY_DIR)/schreier.o $(NAUTY_DIR)/naurng.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
