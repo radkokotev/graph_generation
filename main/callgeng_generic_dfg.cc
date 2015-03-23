@@ -1,7 +1,6 @@
-// This is a sample of how to call geng as a procedure rather than running it as
-// a separate process.  The basic idea is to construct an argument list for
-// geng's main() function.  At compile time, assign a name to the macros OUTPROC
-// and GENG_MAIN.  A typical Unix-style compilation command would be:
+// This is a program calls geng as a procedure in order to generate diamond-free
+// graphs. At compile time, assign a name to the macros OUTPROC and GENG_MAIN.
+// A typical Unix-style compilation command would be:
 //   g++ -o callgeng_generic_girth -O3 -DMAXN=32
 //      -DOUTPROC=myoutproc -DGENG_MAIN=geng_main -DPRUNE=geng_prune
 //      callgeng_generic_girth.cc geng.c girth_5_graph.o graph_utilities.o

@@ -26,8 +26,6 @@ const int kNumberOfVertices = 8;
 const string kExportFileName = "girth_5_order_temp.txt";
 
 int64_t final_count = 0;
-int64_t all_graphs_count = 0;
-int64_t all_connected_diamond_free_count = 0;
 
 bool IsGraphExtremal(const Graph &g) {
   // Numbers taken from
