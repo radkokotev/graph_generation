@@ -37,7 +37,7 @@ void ExportGraphsToFile(const string &filename, const vector<Graph *> &graphs) {
 } // namespace
 
 int main() {
-  const int kGraphOrder = 8;
+  const int kGraphOrder = 9;
   const string kFileName = "canonical_dfg_8.txt";
   CanonicalGraphGenerator gen(kGraphOrder, new DiamondFreeGraph());
   vector<Graph *> *graphs = new vector<Graph *>();
